@@ -113,40 +113,111 @@ const MobileNav = ({ onMobile, setOnMobile }) => {
 
 const HeroSection = () => {
   return (
-    <div className="flex flex-col md:flex-row mt-20 py-12 px-7 md:px-12 lg:px-24 gap-8">
-      <div className="md:basis-1/2 flex flex-col md:justify-center items-start gap-2 sm:gap-4">
-        <h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-medium">
-          Assessment easier with <strong>Quiz Vessel</strong>.
+    <div className="grid md:grid-cols-2 mt-16 md:mt-20 py-8 sm:py-16 px-4 sm:px-8 md:px-12 lg:px-24 gap-4 md:gap-8 bg-gray-50">
+      <div className="flex flex-col justify-center items-center text-center md:text-left">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-5xl font-medium md:font-semibold lg:font-extrabold">
+          Assessment easier with{" "}
+          <strong className="text-[#1554ff]">Quiz Vessel.</strong>
         </h1>
-        <p className="text-xs sm:text-base">
+        <p className="mt-2 md:mt-4 text-xs sm:text-base lg:text-xl">
           provides various types of quiz models and quiz time models
         </p>
         <Link
           to="/"
-          className="py-3 lg:py-4 px-4 lg:px-12 text-white font-medium sm:font-semibold rounded-lg bg-orange-500 hover:shadow-orange-md mx-auto">
+          className="md:self-start mt-4 md:mt-8 py-3 lg:py-4 px-4 lg:px-12 text-white font-medium sm:font-semibold rounded-lg bg-orange-500">
           Get Started
         </Link>
       </div>
-      <div className="h-48 md:h-80 md:basis-1/2">
-        <img
-          src="/image/landingPage/heroImage.png"
-          alt=""
-          className="mx-auto h-full w-full max-w-sm sm:max-w-3xl"
-        />
-      </div>
+      <img
+        src="/image/landingPage/heroImage.png"
+        alt=""
+        className="h-48 md:h-80 mx-auto md:mr-0 md:ml-auto w-full max-w-sm md:max-w-md"
+      />
     </div>
   );
 };
 
-const Benefit = () => {
+const Feature = () => {
   return (
-    <div className="h-96 flex flex-wrap justify-center px-10 bg-lime-200 gap-x-8 gap-y-4 [&>*]:grow [&>*]:max-w-[450px] [&>*]:min-w-[350px]">
-      <div className=" bg-red-50">a</div>
-      <div className=" bg-red-100">b</div>
-      <div className=" bg-red-200">c</div>
-      <div className=" bg-red-300">d</div>
-      <div className=" bg-red-300">d</div>
-    </div>
+    <section class="px-4 sm:px-8 md:px-12 lg:px-24 py-8 sm:py-16 bg-[#1c1a27]">
+      <h2 class="text-2xl sm:text-4xl font-bold capitalize text-center md:text-left text-white">
+        What makes us special
+      </h2>
+      <p class="mt-4 text-gray-300">
+        Menyediakan berbagai tipe quiz atau ujian sesuai dengan berbagai
+        keperluan
+      </p>
+      <div class="mt-8 md:mt-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+        <div class="p-6 bg-gray-100 rounded-lg">
+          <img
+            className="w-1/2 h-20 mb-2 mx-auto"
+            alt="standard limitation"
+            src="/image/landingPage/standardlimit.svg"
+          />
+          <h3 class="mb-2 text-lg font-bold capitalize">
+            standard time limitation
+          </h3>
+          <p class="text-sm leading-6 text-gray-600">
+            suatu opsi ujian yang digunakan pada umumnya, menggunakan batasan
+            waktu pada keseluruhan quiz
+          </p>
+        </div>
+
+        <div class="p-6 bg-gray-100 rounded-lg">
+          <img
+            className="w-1/2 h-20 mb-2 mx-auto"
+            alt="time limit on each question"
+            src="/image/landingPage/eachquestionlimit.svg"
+          />
+          <h3 class="mb-2 text-lg font-bold capitalize">
+            time limit on each question
+          </h3>
+          <p class="text-sm leading-6 text-gray-600">
+            suatu opsi ujian dengan limitasi waktu pada tiap pertanyaan
+          </p>
+        </div>
+
+        <div class="p-6 bg-gray-100 rounded-lg">
+          <img
+            className="w-1/2 h-20 mb-2 mx-auto"
+            alt="time limit on seperate section"
+            src="/image/landingPage/sectionlimit.svg"
+          />
+          <h3 class="mb-2 text-lg font-bold capitalize">
+            section time limitation
+          </h3>
+          <p class="text-sm leading-6 text-gray-600">
+            suatu opsi ujian dengan limitasi waktu pada beberapa sesi, dapat
+            digunakan jika ingin membagi quiz menjadi beberapa bagian
+          </p>
+        </div>
+
+        <div class="p-6 bg-gray-100 rounded-lg">
+          <img
+            className="w-1/2 h-20 mb-2 mx-auto"
+            alt="untime quiz"
+            src="/image/landingPage/untimequiz.svg"
+          />
+          <h3 class="mb-2 text-lg font-bold capitalize">untimed quiz</h3>
+          <p class="text-sm leading-6 text-gray-600">
+            opsi ujian dengan tanpa menggunakan batasan waktu ujian
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const Footer = () => {
+  return (
+    <footer class="px-4 sm:px-8 md:px-12 lg:px-24 py-4 sm:flex sm:justify-between sm:items-center bg-gray-50">
+      <Link to="/" reloadDocument>
+        <img src="/image/logo/logo.png" alt="logo Footer" className="mx-auto" />
+      </Link>
+      <p class="mt-4 sm:mt-0 text-sm text-center text-gray-500">
+        Copyright &copy; 2022. All rights reserved.
+      </p>
+    </footer>
   );
 };
 
@@ -155,7 +226,8 @@ const Home = () => {
     <>
       <Navigation />
       <HeroSection />
-      <Benefit />
+      <Feature />
+      <Footer />
     </>
   );
 };
