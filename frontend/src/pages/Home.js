@@ -123,13 +123,13 @@ const MobileNav = ({ onMobile, setOnMobile }) => {
       <div className="flex flex-col items-center gap-2">
         <Link
           className="w-3/4 py-2 text-center font-medium text-[#1554FF] border-2 border-[#1554FF] rounded-lg"
-          to="/">
+          to="/auth/login">
           Login
         </Link>
         <p>or</p>
         <Link
           className="w-3/4 py-2 text-center font-medium text-white border-2 bg-[#1554FF] rounded-lg"
-          to="/">
+          to="/auth/register">
           Register
         </Link>
       </div>
@@ -151,7 +151,7 @@ const HeroSection = () => {
             provides various types of quiz models and quiz time models
           </p>
           <Link
-            to="/"
+            to="/auth/register"
             className="inline-flex items-center mt-4 md:mt-8 py-2 lg:py-4 px-4 lg:px-8 gap-1 font-medium sm:font-semibold text-white rounded-lg bg-orange-500">
             Get Started <Icon icon={faArrowLeft} />
           </Link>
