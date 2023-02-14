@@ -1,20 +1,27 @@
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+require("dotenv").config();
+const express = require("express");
+const cookieParser = require("cookie-parser");
+const path = require("path");
+const logger = require("morgan");
+const cors = require("cors");
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const app = express();
 
-var app = express();
+const indexRouter = require("./routes/index");
+const authRouter = require("./routes/auth");
 
-app.use(logger('dev'));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
+app.use(logger("dev"));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use("/", indexRouter);
+app.use("/auth", authRouter);
 
 module.exports = app;
