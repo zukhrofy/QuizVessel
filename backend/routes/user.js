@@ -1,9 +1,17 @@
+// import module
 const express = require("express");
 const router = express.Router();
-const verifyJWT = require("../middleware/VerifyTokens");
 
-router.get("/", verifyJWT, (req, res) => {
-  res.json({ isLoggedIn: true, userame: req.user.userame });
-});
+// import controller
+const {
+  validate,
+  loginUser,
+  signupUser,
+} = require("../controllers/UserController");
+
+// // login route
+router.post("/login", validate("loginUser"), loginUser);
+// signup route
+router.post("/signup", validate("signupUser"), signupUser);
 
 module.exports = router;

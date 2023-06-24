@@ -6,13 +6,13 @@ import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import ClipLoader from "react-spinners/ClipLoader";
 // import hooks
-import { useLogin } from "../../hooks/useLogin";
-// import form schema
-import { loginSchema } from "./authSchema";
+import { useSignup } from "../../hooks/useSignup";
+// import from schema
+import { signupSchema } from "./authSchema";
 // import local library
 import { useState } from "react";
 
-const Login = () => {
+const Signup = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   // react hook form config
   const {
@@ -21,16 +21,15 @@ const Login = () => {
     formState: { errors, isValid },
   } = useForm({
     mode: "onBlur",
-    resolver: yupResolver(loginSchema),
+    resolver: yupResolver(signupSchema),
   });
-
-  const { login, error } = useLogin();
+  const { signup, error } = useSignup();
 
   // event submit form
-  const onSubmit = async ({ email, password }) => {
+  const onSubmit = async ({ email, username, password }) => {
     setIsSubmitting(true);
-    // login user
-    await login(email, password);
+    // register user
+    await signup(email, username, password);
     setIsSubmitting(false);
   };
 
@@ -41,7 +40,7 @@ const Login = () => {
         {/* background image */}
         <img
           src="/image/auth/login-register.jpg"
-          alt="login page background"
+          alt="signup page background"
           className="absolute w-full h-full object-cover opacity-60"
         />
         {/* hidden in mobile screen */}
@@ -62,16 +61,15 @@ const Login = () => {
           {/* logo show in mobile screen */}
           <Link
             className="lg:hidden relative flex justify-center items-center -mt-16 h-16 sm:h-20 w-16 sm:w-20 bg-white rounded-full"
-            to="/"
-            reloadDocument>
+            to="/">
             <img src="/image/logo/logo.png" alt="logo Login" />
           </Link>
           {/* title */}
           <h1 className="flex items-center mt-2 gap-2 text-lg sm:text-3xl font-bold text-gray-900">
-            Login
+            Signup{" "}
             <img
               src="/image/logo/logo.png"
-              alt="brand logo on login"
+              alt="brand logo on signup"
               className="hidden lg:block"
             />
           </h1>
@@ -90,6 +88,21 @@ const Login = () => {
               />
               <span className="text-xs text-red-500">
                 {errors.email?.message}
+              </span>
+            </div>
+            {/* username */}
+            <div>
+              <label htmlFor="username" className="text-xs font-medium">
+                username
+              </label>
+              <input
+                type="text"
+                id="username"
+                className="w-full text-sm text-gray-800 rounded-md border-gray-400 shadow-sm"
+                {...register("username")}
+              />
+              <span className="text-xs text-red-500">
+                {errors.username?.message}
               </span>
             </div>
             {/* password */}
@@ -112,14 +125,15 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={!isValid}
-                className="inline-flex justify-center items-center gap-1 px-12 py-3 text-sm font-medium text-white bg-blue-600 hover:text-blue-600  hover:bg-transparent hover:border-blue-600 disabled:bg-blue-600/60 disabled:hover:text-white disabled:hover:border-0 rounded-md transition">
-                Login <Icon icon={faArrowRight} />
+                className="inline-flex justify-center items-center gap-1 px-12 py-3 text-sm font-medium text-white hover:text-blue-600 disabled:hover:text-white bg-blue-600 hover:bg-transparent disabled:bg-blue-600/60 hover:border-blue-600 disabled:hover:border-0 rounded-md transition">
+                Signup <Icon icon={faArrowRight} />
               </button>
-              <p className="text-sm text-center text-gray-800">
-                Belum punya akun ?{" "}
-                <Link to="/auth/signup" className="underline text-gray-700">
-                  Signup
+              <p className="text-sm text-center text-gray-500">
+                Already have an account ?{" "}
+                <Link to="/auth/Login" className="underline text-gray-700">
+                  Login
                 </Link>
+                .
               </p>
             </div>
           </form>
@@ -139,4 +153,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;

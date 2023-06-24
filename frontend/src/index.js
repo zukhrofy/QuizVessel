@@ -1,14 +1,26 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter as Router } from "react-router-dom";
-import "./index.css";
 import App from "./App";
+import "./index.css";
+
+import { BrowserRouter } from "react-router-dom";
+
+// context
+import { AuthContextProvider } from "./contexts/authContext";
+import { QuizContextProvider } from "./contexts/quizContext";
+import { ReportContextProvider } from "./contexts/reportContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
-    <Router>
-      <App />
-    </Router>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <AuthContextProvider>
+    <QuizContextProvider>
+      <ReportContextProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ReportContextProvider>
+    </QuizContextProvider>
+  </AuthContextProvider>
+  // </React.StrictMode>
 );

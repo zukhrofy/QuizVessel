@@ -1,4 +1,6 @@
+// local library
 import { useEffect, useState } from "react";
+// third library
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import {
@@ -19,7 +21,9 @@ const Home = () => {
   );
 };
 
+// navbar
 export const Navigation = () => {
+  // state untuk mengatur navbar responsif pada layar hp
   const [onMobile, setOnMobile] = useState(false);
 
   return (
@@ -30,8 +34,10 @@ export const Navigation = () => {
   );
 };
 
+// navbar pada desktop
 const DesktopNav = ({ setOnMobile }) => {
   useEffect(() => {
+    // fungsi untuk navbar responsif sesuai ukuran layar
     const onResizeEvent = () => window.innerWidth > 640 && setOnMobile(false);
     window.addEventListener("resize", onResizeEvent);
 
@@ -42,7 +48,7 @@ const DesktopNav = ({ setOnMobile }) => {
 
   return (
     <header className="fixed top-0 z-10 w-full bg-white shadow-md">
-      {/* container */}
+      {/* container navbar*/}
       <div className="flex justify-between items-center max-w-screen-2xl h-16 md:h-20 mx-5 sm:mx-8 md:mx-12 lg:mx-24 2xl:mx-auto transition-all duration-200">
         {/* brand logo navbar */}
         <Link to="/" reloadDocument>
@@ -52,7 +58,7 @@ const DesktopNav = ({ setOnMobile }) => {
             className="scale-75 md:scale-105 origin-left"
           />
         </Link>
-        {/* navbar menu on wide screen */}
+        {/* navbar menu on wide screen, hidden saat layar kecil */}
         <nav className="hidden sm:flex items-center gap-x-6 md:gap-x-10">
           {/* <div className="space-x-6 md:space-x-10 text-base lg:text-lg font-medium capitalize text-[#474554]">
             <Link to="#" className="hover:text-[#474554]/75">
@@ -65,6 +71,7 @@ const DesktopNav = ({ setOnMobile }) => {
               Pricing
             </Link>
           </div> */}
+          {/* tombol login */}
           <Link
             className="flex items-center gap-1 px-6 py-1 md:py-2 text-base lg:text-lg font-medium text-white rounded-md bg-[#E70021] hover:bg-[#E70021]/75"
             to="/auth/login">
@@ -84,6 +91,7 @@ const DesktopNav = ({ setOnMobile }) => {
   );
 };
 
+// navbar layar hp
 const MobileNav = ({ onMobile, setOnMobile }) => {
   return (
     <header
@@ -109,7 +117,7 @@ const MobileNav = ({ onMobile, setOnMobile }) => {
         />
       </div>
       {/* mobile nav menu */}
-      <nav className="grid mt-6 mb-12 text-gray-800">
+      <nav className="flex flex-col mt-6 mb-12 text-gray-800">
         <Link to="#" className="py-4 border-b">
           About
         </Link>
@@ -129,29 +137,30 @@ const MobileNav = ({ onMobile, setOnMobile }) => {
         <p>or</p>
         <Link
           className="w-3/4 py-2 text-center font-medium text-white border-2 bg-[#1554FF] rounded-lg"
-          to="/auth/register">
-          Register
+          to="/auth/signup">
+          signup
         </Link>
       </div>
     </header>
   );
 };
 
+// section hero dibawah navbar
 const HeroSection = () => {
   return (
     <section className="mt-16 md:mt-20 bg-teal-50">
-      <div className="grid md:grid-cols-2 py-8 sm:py-16 mx-5 sm:mx-8 md:mx-12 lg:mx-24 2xl:mx-auto max-w-screen-2xl gap-6">
+      <div className="grid md:grid-cols-2 gap-6 py-8 sm:py-16 mx-5 sm:mx-8 md:mx-12 lg:mx-24 2xl:mx-auto max-w-screen-2xl">
         {/* left side */}
         <div className="md:flex md:flex-col md:justify-center md:items-start text-center md:text-left">
           <h1 className="text-2xl sm:text-3xl md:text-4xl xl:text-5xl font-medium md:font-semibold lg:font-extrabold">
-            Assessment easier with{" "}
+            Penilaian menjadi mudah dengan{" "}
             <span className="text-[#1554ff]">Quiz Vessel.</span>
           </h1>
           <p className="mt-2 md:mt-4 text-xs sm:text-base lg:text-xl">
-            provides various types of quiz models and quiz time models
+            Menyediakan Berbagai Timer Quiz untuk Memudahkan Penilaian
           </p>
           <Link
-            to="/auth/register"
+            to="/auth/signup"
             className="inline-flex items-center mt-4 md:mt-8 py-2 lg:py-4 px-4 lg:px-8 gap-1 font-medium sm:font-semibold text-white rounded-lg bg-orange-500">
             Get Started <Icon icon={faArrowLeft} />
           </Link>
@@ -159,14 +168,15 @@ const HeroSection = () => {
         {/* right side or below side on mobile screen */}
         <img
           src="/image/landingPage/heroImage.png"
-          alt=""
-          className="h-48 md:h-80 mx-auto md:mr-0 md:ml-auto w-full max-w-sm md:max-w-lg"
+          alt="hero landing"
+          className="h-48 md:h-80 w-full max-w-sm md:max-w-lg mx-auto md:mr-0 md:ml-auto"
         />
       </div>
     </section>
   );
 };
 
+// section feature quiz
 const Feature = () => {
   return (
     <section className="bg-[#1c1a27]">
@@ -178,21 +188,20 @@ const Feature = () => {
         </h2>
         {/* section description */}
         <p className="mt-2 md:mt-4 text-xs sm:text-base text-center md:text-left text-gray-300">
-          Menyediakan berbagai tipe quiz atau ujian sesuai dengan berbagai
-          keperluan
+          Menyediakan Berbagai Timer Quiz untuk Memudahkan Penilaian
         </p>
         {/* feature list container */}
-        <div className="grid sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 mt-8 md:mt-16 gap-8 2xl:gap-12">
+        <div className="grid gap-8 2xl:gap-12 sm:grid-cols-2 xl:grid-cols-3 mt-8 md:mt-16">
           {/* feature list */}
-          <div className="grid sm:grid-cols-4 gap-4 sm:gap-1 p-6 sm:p-0 bg-white rounded-lg overflow-hidden">
+          <div className="grid sm:grid-cols-4 gap-4 sm:gap-1 p-6 sm:p-1 bg-white rounded-lg overflow-hidden">
             {/* title and desc feature */}
             <div className="sm:col-span-3 order-2 sm:order-1 self-center sm:p-6 sm:pr-0">
               <h3 className="mb-1 text-lg font-bold capitalize">
-                standard time limitation
+                Regular Time Quiz
               </h3>
               <p className="text-sm leading-6 text-gray-600">
-                suatu opsi ujian yang digunakan pada umumnya, menggunakan
-                batasan waktu pada keseluruhan quiz
+                pilihan quiz untuk membantu pengguna mengembangkan kemampuan
+                untuk mengatur waktu dan keputusan peserta secara efektif.
               </p>
             </div>
             {/* image feature */}
@@ -207,53 +216,18 @@ const Feature = () => {
             {/* title and desc feature */}
             <div className="sm:col-span-3 order-2 sm:order-1 self-center sm:p-6 sm:pr-0">
               <h3 className="mb-1 text-lg font-bold capitalize">
-                time limit on each question
+                Section Time Quiz
               </h3>
               <p className="text-sm leading-6 text-gray-600">
-                suatu opsi ujian dengan limitasi waktu pada tiap pertanyaan
-              </p>
-            </div>
-            {/* image feature */}
-            <img
-              src="/image/landingPage/eachquestionlimit.svg"
-              alt="time limit on each question"
-              className="order-1 sm:order-2 h-24 sm:h-auto sm:self-stretch mx-auto pt-3 sm:bg-gray-100 sm:rounded-tl-full sm:rounded-bl-full"
-            />
-          </div>
-          {/* feature list */}
-          <div className="grid sm:grid-cols-4 items-stretch gap-4 sm:gap-1 p-6 sm:p-0 bg-white rounded-lg overflow-hidden">
-            {/* title and desc feature */}
-            <div className="sm:col-span-3 order-2 sm:order-1 self-center sm:p-6 sm:pr-0">
-              <h3 className="mb-1 text-lg font-bold capitalize">
-                section time limitation
-              </h3>
-              <p className="text-sm leading-6 text-gray-600">
-                suatu opsi ujian dengan limitasi waktu pada beberapa sesi, dapat
-                digunakan jika ingin membagi quiz menjadi beberapa bagian
+                pilihan quiz dengan membagi quiz dalam beberapa bagian dengan
+                pembagian waktunya sendiri, memudahkan pengguna berkonsentrasi
+                pada topik tertentu
               </p>
             </div>
             {/* image feature */}
             <img
               src="/image/landingPage/sectionlimit.svg"
               alt="time limit on seperate section"
-              className="order-1 sm:order-2 h-24 sm:h-auto sm:self-stretch mx-auto pt-3 sm:bg-gray-100 sm:rounded-tl-full sm:rounded-bl-full"
-            />
-          </div>
-          {/* feature list */}
-          <div className="grid sm:grid-cols-4 items-stretch gap-4 sm:gap-1 p-6 sm:p-0 bg-white rounded-lg overflow-hidden">
-            {/* title and desc feature */}
-            <div className="sm:col-span-3 order-2 sm:order-1 self-center sm:p-6 sm:pr-0">
-              <h3 className="mb-1 text-lg font-bold capitalize">
-                untimed quiz
-              </h3>
-              <p className="text-sm leading-6 text-gray-600">
-                opsi ujian dengan tanpa menggunakan batasan waktu ujian
-              </p>
-            </div>
-            {/* image feature */}
-            <img
-              src="/image/landingPage/untimequiz.svg"
-              alt="untime quiz"
               className="order-1 sm:order-2 h-24 sm:h-auto sm:self-stretch mx-auto pt-3 sm:bg-gray-100 sm:rounded-tl-full sm:rounded-bl-full"
             />
           </div>
