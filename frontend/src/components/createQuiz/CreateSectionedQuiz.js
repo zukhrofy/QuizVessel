@@ -1,18 +1,16 @@
 // import third library
-import { useForm, useFieldArray } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import TextareaAutosize from "react-textarea-autosize";
 import ClipLoader from "react-spinners/ClipLoader";
+import { useForm, useFieldArray } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import TextareaAutosize from "react-textarea-autosize";
 // use context hooks
 import useAuthContext from "../../hooks/useAuthContext";
 // yup schema and default value
-import { sectionedQuizValue, sectionedSchema } from "./createQuizSchema";
+import { sectionedQuizValue, sectionedSchema } from "../../schemas/quizSchema";
+// import local library
 import { useState } from "react";
-
-// skema section quiz form
-const sectionedQuizSchema = sectionedSchema;
 
 const CreateSectionedQuiz = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,7 +23,7 @@ const CreateSectionedQuiz = () => {
     reset,
   } = useForm({
     mode: "onBlur",
-    resolver: yupResolver(sectionedQuizSchema),
+    resolver: yupResolver(sectionedSchema),
     defaultValues: sectionedQuizValue,
   });
 
@@ -43,7 +41,6 @@ const CreateSectionedQuiz = () => {
   });
 
   const onSubmit = async (data) => {
-    console.log(data);
     if (!user) {
       navigate("auth/login");
     }
@@ -56,6 +53,7 @@ const CreateSectionedQuiz = () => {
           Authorization: `Bearer ${user.token}`,
         },
       });
+
       if (response.status === 200) {
         reset();
         setIsSubmitting(false);
@@ -88,7 +86,7 @@ const CreateSectionedQuiz = () => {
                 type="text"
                 placeholder="Nama kuis"
                 {...register("title")}
-                className={`w-1/2 mb-3 px-4 py-2 border border-gray-300 rounded ${
+                className={`w-1/2 px-4 py-2 border border-gray-300 rounded ${
                   errors?.title && "border-red-400"
                 }`}
               />
@@ -102,8 +100,8 @@ const CreateSectionedQuiz = () => {
             {sectionFields.map((section, sectionIndex) => (
               <div
                 key={section.id}
-                id={`sections-${sectionIndex}`}
-                className="my-5 p-10 bg-gray-100 border shadow-xl rounded">
+                className="my-5 p-10 bg-gray-100 border border-slate-400"
+                id={`sections-${sectionIndex}`}>
                 {/* section id */}
                 <input
                   type="hidden"
@@ -130,10 +128,14 @@ const CreateSectionedQuiz = () => {
                 <div className="flex justify-between mb-4">
                   {/* section title */}
                   <div className="flex flex-col">
-                    <label className="mb-1">Section Title</label>
+                    <label>Section Title</label>
                     <TextareaAutosize
                       {...register(`sections[${sectionIndex}].sectionTitle`)}
-                      className="px-4 py-2 border border-gray-300 rounded"
+                      className={`px-4 py-2 rounded ${
+                        errors.sections?.[sectionIndex]?.sectionTitle
+                          ? "border border-red-400"
+                          : "border-0"
+                      }`}
                       minRows={1}
                       maxRows={2}
                       placeholder="section title"
@@ -145,11 +147,15 @@ const CreateSectionedQuiz = () => {
                   </div>
                   {/* section time limit */}
                   <div className="flex flex-col">
-                    <label className="mb-1">Section Time</label>
+                    <label>Section Time</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
-                        className="p-2 border border-gray-300 rounded"
+                        className={`w-1/2 p-2 border border-gray-300 rounded ${
+                          errors.sections?.[sectionIndex]?.sectionTimeLimit
+                            ? "border border-red-400"
+                            : "border-0"
+                        }`}
                         {...register(
                           `sections[${sectionIndex}].sectionTimeLimit`
                         )}
@@ -165,7 +171,6 @@ const CreateSectionedQuiz = () => {
                     </span>
                   </div>
                 </div>
-
                 {/* question sets */}
                 <NestedSoal
                   sectionIndex={sectionIndex}
@@ -174,7 +179,7 @@ const CreateSectionedQuiz = () => {
               </div>
             ))}
             {/* error ketika section hanya satu */}
-            <div className="text-red-500 mt-1">{errors?.sections?.message}</div>
+            <div className="text-red-500">{errors?.sections?.message}</div>
             {/* add section button */}
             <button
               type="button"
@@ -190,7 +195,7 @@ const CreateSectionedQuiz = () => {
                   ],
                 })
               }
-              className="text-blue-500">
+              className="w-full mb-4 py-3 text-white bg-blue-500 border rounded">
               Add Section
             </button>
 
@@ -214,15 +219,16 @@ const CreateSectionedQuiz = () => {
 
 const Sidebar = ({ sectionFields }) => {
   return (
-    <aside className="bg-blue-300 p-6">
-      <div className=" grid grid-cols-2 gap-3">
-        {sectionFields.map((question, index) => (
+    <aside className="p-6 bg-blue-300">
+      <h2 className="mb-3 text-xl font-semibold">Section Pointer</h2>
+      <div className="grid grid-cols-3 gap-3">
+        {sectionFields.map((section, index) => (
           <div
-            key={question.id}
+            key={section.id}
             onClick={() =>
               document.getElementById(`sections-${index}`).scrollIntoView()
             }
-            className="px-4 py-2 font-semibold bg-white rounded-lg cursor-pointer">
+            className="px-3 py-2 font-semibold bg-white rounded-lg cursor-pointer">
             S {index + 1}
           </div>
         ))}
@@ -240,7 +246,7 @@ const TopNav = ({ user }) => {
           <span>{user.username}</span>
           <Link
             to="/dashboard/library"
-            className="px-6 py-2 text-white bg-indigo-300 hover:bg-indigo-500 border rounded">
+            className="px-6 py-2 text-white bg-indigo-500 border rounded">
             <span className="text-sm font-medium">back</span>
           </Link>
         </div>
@@ -266,7 +272,15 @@ const NestedSoal = ({ sectionIndex, control, register, errors }) => {
         <>
           <div
             key={question.id}
-            className="bg-white mb-2 p-10 border shadow-md rounded">
+            className="mb-2 p-10 bg-white border border-slate-400">
+            {/* question id */}
+            <input
+              type="hidden"
+              value={questionIndex}
+              {...register(
+                `sections.${sectionIndex}.questionSet[${questionIndex}].questionId`
+              )}
+            />
             <div className="flex justify-between items-center mb-1">
               {/* question number */}
               <h1 className="text-xl font-semibold">
@@ -277,25 +291,21 @@ const NestedSoal = ({ sectionIndex, control, register, errors }) => {
                 <button
                   type="button"
                   onClick={() => removeQuestionSet(questionIndex)}
-                  className="text-3xl">
+                  className="text-2xl">
                   x
                 </button>
               )}
             </div>
-            {/* question id */}
-            <input
-              type="hidden"
-              value={questionIndex}
-              {...register(
-                `sections.${sectionIndex}.questionSet[${questionIndex}].questionId`
-              )}
-            />
             {/* question text */}
             <TextareaAutosize
               {...register(
                 `sections[${sectionIndex}].questionSet[${questionIndex}].questionText`
               )}
-              className="w-full p-3 border border-gray-500 rounded"
+              className={`w-full p-2 border border-gray-400 rounded ${
+                errors?.sections?.[sectionIndex]?.questionSet?.[questionIndex]
+                  ?.questionText && "border border-red-400"
+              }`}
+              placeholder="Type your question.."
             />
             <span className="text-sm text-red-500">
               {
@@ -303,7 +313,6 @@ const NestedSoal = ({ sectionIndex, control, register, errors }) => {
                   ?.questionText?.message
               }
             </span>
-
             {/* Add answer options and correct answer fields */}
             <NestedAnswer
               sectionIndex={sectionIndex}
@@ -327,7 +336,7 @@ const NestedSoal = ({ sectionIndex, control, register, errors }) => {
             correctAnswer: "",
           })
         }
-        className="text-blue-500">
+        className="w-full py-3 text-white bg-indigo-500 border rounded">
         Add Question
       </button>
     </div>
@@ -351,7 +360,7 @@ const NestedAnswer = ({
     name: `sections.${sectionIndex}.questionSet.${questionIndex}.answer`,
   });
 
-  const getAnswerLetter = (index) => {
+  const answerLetter = (index) => {
     const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     return letters[index];
   };
@@ -362,7 +371,7 @@ const NestedAnswer = ({
         <div key={answer.id}>
           <div className="flex items-center">
             {/* letter */}
-            <span>{getAnswerLetter(answerIndex)}</span>
+            <span>{answerLetter(answerIndex)}</span>
             {/* option text */}
             <TextareaAutosize
               {...register(
@@ -370,7 +379,10 @@ const NestedAnswer = ({
               )}
               minRows={1}
               maxRows={4}
-              className="w-1/2 ml-4 px-4 py-3 border border-gray-400 rounded"
+              className={`w-1/2 ml-4 px-4 py-3 border border-gray-400 rounded ${
+                errors?.sections?.[sectionIndex]?.questionSet?.[questionIndex]
+                  ?.answer?.[answerIndex] && "border border-red-400"
+              }`}
               placeholder={`option ${answerIndex + 1}`}
             />
             {/* input radio untuk correct answer */}
@@ -410,14 +422,14 @@ const NestedAnswer = ({
             )}
           </div>
           {/* error ketika option text kosong */}
-          <span className="ml-8 text-red-500">
+          <div className="ml-8 text-sm text-red-400">
             {
               errors?.sections?.[sectionIndex]?.questionSet?.[questionIndex]
                 ?.answer?.[answerIndex]?.message
             }
-          </span>
+          </div>
           {/* error ketika option kurang dari dua */}
-          <div className="text-red-500">
+          <div className="ml-8 mb-3 text-sm text-red-400">
             {
               errors?.sections?.[sectionIndex]?.questionSet?.[questionIndex]
                 ?.answer?.message

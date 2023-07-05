@@ -6,11 +6,13 @@ import useAuthContext from "../../hooks/useAuthContext";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { format } from "date-fns";
+import { id } from "date-fns/locale";
+
 import { BarLoader } from "react-spinners";
 
 const ReportQuiz = () => {
-  const [report, setReport] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [report, setReport] = useState([]);
 
   const { user } = useAuthContext();
 
@@ -41,7 +43,7 @@ const ReportQuiz = () => {
       {!loading && (
         <>
           <h1 className="mb-5 text-2xl font-bold">Report Quiz</h1>
-          <table className="min-w-full divide-y-2 divide-black bg-white text-sm">
+          <table className="min-w-full divide-y-2 divide-black text-sm bg-white">
             <thead>
               <tr className="text-lg text-gray-900">
                 <th className="p-4">Nama kuis</th>
@@ -65,13 +67,17 @@ const ReportQuiz = () => {
                     {element.finished ? "Finished" : "Ongoing"}
                   </td>
                   <td className="p-3">
-                    {format(new Date(element.createdAt), "dd-MM-yyyy")}
+                    {format(new Date(element.createdAt), "dd MMMM yyyy", {
+                      locale: id,
+                    })}
                   </td>
                   <td className="p-3">
-                    {format(new Date(element.deadline * 1000), "dd-MM-yyyy")}
+                    {format(new Date(element.deadline * 1000), "dd MMMM yyyy", {
+                      locale: id,
+                    })}
                   </td>
                   <td className="p-3">{element.participant.length}</td>
-                  <td className="py-2 flex gap-2">
+                  <td className="p-3">
                     <Link
                       to={`/report/${element._id}`}
                       className="px-4 py-2 text-xs font-medium text-white bg-indigo-600 rounded">

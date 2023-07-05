@@ -8,7 +8,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 // import hooks
 import { useLogin } from "../../hooks/useLogin";
 // import form schema
-import { loginSchema } from "./authSchema";
+import { loginSchema } from "../../schemas/authSchema";
 // import local library
 import { useState } from "react";
 
@@ -51,7 +51,7 @@ const Login = () => {
           {/* desc */}
           <p className="mt-4 text-white/90">
             Penilaian menjadi mudah dengan Quiz Vessel. Menyediakan Berbagai
-            Timer Quiz untuk Memudahkan Penilaian
+            Timer Quiz untuk Memudahkan Penilaian Sesuai Kebutuhan
           </p>
         </div>
       </div>

@@ -11,9 +11,9 @@ import DetailRegularQuiz from "./DetailRegularQuiz";
 import DetailSectionedQuiz from "./DetailSectionedQuiz";
 
 const DetailQuiz = () => {
+  const [loading, setLoading] = useState(true);
   const [quiz, setQuiz] = useState({});
   const [quizType, setQuizType] = useState("");
-  const [loading, setLoading] = useState(true);
   const { user } = useAuthContext();
   const { id } = useParams();
 
@@ -51,9 +51,11 @@ const DetailQuiz = () => {
           <RingLoader color="#007BFF" loading={loading} size={150} />
         </div>
       )}
-      {!loading && quizType === "regular" && <DetailRegularQuiz quiz={quiz} />}
-      {!loading && quizType === "sectioned" && (
-        <DetailSectionedQuiz quiz={quiz} />
+      {!loading && (
+        <>
+          {quizType === "regular" && <DetailRegularQuiz quiz={quiz} />}
+          {quizType === "sectioned" && <DetailSectionedQuiz quiz={quiz} />}
+        </>
       )}
     </>
   );

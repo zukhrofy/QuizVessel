@@ -2,7 +2,9 @@
 const express = require("express");
 const router = express.Router();
 
+// import middleware
 const requireAuth = require("../middleware/requireAuth");
+
 // import controller
 const {
   getQuiz,
@@ -12,7 +14,7 @@ const {
   assignQuiz,
 } = require("../controllers/QuizController");
 
-// middleware
+// use middleware
 router.use(requireAuth);
 
 // get all quiz
@@ -24,6 +26,6 @@ router.post("/", createQuiz);
 // update quiz
 router.patch("/:id", updateQuiz);
 // asign quiz
-router.post("/asign/:id", assignQuiz);
+router.post("/assign/:id", assignQuiz);
 
 module.exports = router;

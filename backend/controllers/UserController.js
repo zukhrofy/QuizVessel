@@ -31,7 +31,6 @@ const validate = (method) => {
 
 // signup a user
 const signupUser = async (req, res) => {
-  console.log("signup");
   // catch validation error
   const errors = validationResult(req);
   // return error

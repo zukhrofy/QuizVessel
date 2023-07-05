@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import "../../utils/yupLocale";
+import "../utils/yupLocale";
 
 // skema validasi form
 export const loginSchema = yup

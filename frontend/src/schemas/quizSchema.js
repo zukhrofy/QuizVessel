@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import "../../utils/yupLocale";
+import "../utils/yupLocale";
 
 export const regularSchema = yup
   .object({
@@ -7,7 +7,7 @@ export const regularSchema = yup
     time_limit: yup
       .number()
       .typeError("tidak boleh kosong")
-      .min(30, "minimal 30 menit")
+      .min(15, "minimal 15 menit")
       .nullable(),
     questions: yup
       .array(
@@ -31,8 +31,8 @@ export const regularSchema = yup
   .required();
 
 export const regularQuizValue = {
-  quiz_type: "regular",
   title: "",
+  quiz_type: "regular",
   time_limit: 0,
   questions: [
     {
@@ -91,6 +91,16 @@ export const sectionedQuizValue = {
   title: "",
   quiz_type: "sectioned",
   sections: [
+    {
+      sectionTitle: "",
+      sectionTimeLimit: 0,
+      questionSet: [
+        {
+          questionText: "",
+          answer: ["option 1", "option 2"],
+        },
+      ],
+    },
     {
       sectionTitle: "",
       sectionTimeLimit: 0,

@@ -11,9 +11,9 @@ import PlayRegulerQuiz from "./PlayRegulerQuiz";
 import PlaySectionedQuiz from "./PlaySectionedQuiz";
 
 const PlayQuizStart = () => {
+  const [loading, setLoading] = useState(true);
   const { quizToken } = useParams();
   const { user } = useAuthContext();
-  const [loading, setLoading] = useState(true);
   const [quiz, setQuiz] = useState({});
 
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const PlayQuizStart = () => {
   // use effect ketika awal start quiz
   useEffect(() => {
     const fetchQuiz = async () => {
-      // get response from server
+      // get assigned quiz
       try {
         const response = await axios(`/play/${quizToken}/start/`, {
           headers: {
@@ -31,15 +31,15 @@ const PlayQuizStart = () => {
         if (response.status === 200) {
           // take response data
           const data = await response.data;
-          // if the user have enter the quiz before
-          if (data.response === "telahMengikutiUjian") {
-            // navigate to result page
-            return navigate(`/play/${quizToken}/finish`);
-          }
           // jika quiz marked as finished
           if (data.response === "ujianSelesai") {
             // navigate to preview page
             return navigate(`/play/${quizToken}/preview`);
+          }
+          // if the user have join the quiz before
+          if (data.response === "telahMengikutiUjian") {
+            // navigate to result page
+            return navigate(`/play/${quizToken}/finish`);
           }
           // if not above condition
           setQuiz(data);

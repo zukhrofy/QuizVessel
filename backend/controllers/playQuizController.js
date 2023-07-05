@@ -1,48 +1,57 @@
 const Participant = require("../models/ParticipantModels");
 const Report = require("../models/ReportModels");
 
+// quiz preview
 const getPlayQuizDetail = async (req, res) => {
-  console.log("masuk review quiz");
+  const quizToken = req.params.quizToken;
+  const assignedQuiz = await Report.findOne({ token: quizToken });
 
-  const tokenQuiz = req.params.quizToken;
-  const report = await Report.findOne({ token: tokenQuiz });
-
-  res.status(200).json(report);
-};
-
-const playQuizStart = async (req, res) => {
-  const tokenQuiz = req.params.quizToken;
-  const user_id = req.user._id;
-
-  const report = await Report.findOne({ token: tokenQuiz });
-
-  // check apakah sudah pernah mengikuti ujian
-  const checkParticipants = await Report.findOne({ token: tokenQuiz }).populate(
-    {
-      path: "participant",
-      match: { user_id: user_id },
-    }
-  );
-
-  if (checkParticipants.participant.length > 0) {
-    return res.status(200).json({ response: "telahMengikutiUjian" });
+  if (!assignedQuiz) {
+    return res.status(404).json({ message: "quiz not found" });
   }
 
+  // check ketersediaan quiz
+  const isFinished = assignedQuiz.finished;
+  if (isFinished) {
+    res.status(403).json({ isFinished });
+  }
+
+  res.status(200).json(assignedQuiz);
+};
+
+// quiz start
+const playQuizStart = async (req, res) => {
+  const quizToken = req.params.quizToken;
+  const user_id = req.user._id;
+
+  // get assigned quiz
+  const assignedQuiz = await Report.findOne({ token: quizToken });
+
   // check quiz sudah di mark selesai / melewati deadline
-  if (report.finished) {
+  if (assignedQuiz.finished) {
     return res.status(200).json({ response: "ujianSelesai" });
   }
 
-  // lanjut saat user belum masuk quiz
+  // check apakah participant sudah pernah mengikuti quiz
+  const participant = await Report.findOne({ token: quizToken }).populate({
+    path: "participant",
+    match: { user_id: user_id },
+  });
+
+  if (participant.participant.length > 0) {
+    return res.status(200).json({ response: "telahMengikutiUjian" });
+  }
+
+  // proses saat user belum mengikuti quiz
   // create participant
   const createParticipant = await Participant.create({
     user_id,
-    report: checkParticipants._id,
+    report: assignedQuiz._id,
   });
 
-  // push participant pada report
+  // push participant pada quiz yang telah di assign
   const pushParticipant = await Report.findOneAndUpdate(
-    { token: tokenQuiz },
+    { token: quizToken },
     {
       $push: {
         participant: createParticipant._id,
@@ -50,51 +59,26 @@ const playQuizStart = async (req, res) => {
     }
   );
 
-  // get report with participant
-  const reportWithParticipant = await Report.findOne({
-    participant: createParticipant._id,
-  }).populate({
-    path: "participant",
-    match: { user_id },
-  });
-
-  return res.status(200).json(reportWithParticipant);
+  // send quiz to user
+  return res.status(200).json(assignedQuiz);
 };
 
-const getQuizResult = async (req, res) => {
-  const tokenQuiz = req.params.quizToken;
-  const user_id = req.user._id;
-
-  const participantResult = await Report.findOne({ token: tokenQuiz }).populate(
-    {
-      path: "participant",
-      match: { user_id: user_id },
-    }
-  );
-  return res.status(200).json(participantResult);
-};
-
+// process submit
 const processSubmit = async (req, res) => {
-  console.log("process submit kuis");
-  // process submit
-  const tokenQuiz = req.params.quizToken;
+  const quizToken = req.params.quizToken;
   const user_id = req.user._id;
   // jawaban peserta
   const quizResponse = req.body;
 
   // get the assigned quiz
   const report = await Report.findOne({
-    token: tokenQuiz,
+    token: quizToken,
   });
 
-  const quizQuestion = report.questions || report.sections;
-
-  // compare the answer
-  const results = {};
-  let nilaiAkhir;
-
-  // if regular quiz
+  // comparation of regular quiz
   if (report.quiz_type === "regular") {
+    const quizQuestion = report.questions;
+    const results = {};
     let score = 0;
     quizQuestion.forEach((question) => {
       const { questionId, correctAnswer } = question;
@@ -108,44 +92,74 @@ const processSubmit = async (req, res) => {
         isCorrect,
       };
     });
-    nilaiAkhir = (score / report.questions.length) * 100;
+
+    const nilaiAkhir = (score / report.questions.length) * 100;
     // update participant status and result
     const participant = await Participant.findOneAndUpdate(
       { report: report._id, user_id },
       { finished: true, result: { ...results }, nilaiAkhir }
     );
+  }
 
-    // if sectioned quiz
-  } else if (report.quiz_type == "sectioned") {
-    console.log(quizQuestion);
-    quizQuestion.forEach((section) => {
+  // comparation if sectioned quiz
+  if (report.quiz_type == "sectioned") {
+    const quizSection = report.sections;
+    const results = {};
+    let totalScore = 0;
+
+    quizSection.forEach((section) => {
       const { sectionId, questionSet } = section;
       const sectionAnswers = quizResponse[sectionId] || null;
 
       results[sectionId] = {};
+      let sectionScore = 0;
 
       questionSet.forEach((question) => {
         const { questionId, correctAnswer } = question;
-        const userAnswer = sectionAnswers[questionId]
-          ? sectionAnswers[questionId]
-          : null;
+        const userAnswer = sectionAnswers?.[questionId] ?? null;
         const isCorrect = userAnswer === correctAnswer;
+
+        if (isCorrect) {
+          sectionScore++;
+        }
 
         results[sectionId][questionId] = {
           selectedAnswer: userAnswer,
           isCorrect,
         };
       });
+
+      const sectionTotalScore = parseFloat(
+        ((sectionScore / questionSet.length) * 100).toFixed(2)
+      );
+      results[sectionId].sectionScore = sectionTotalScore;
+      totalScore = +sectionTotalScore;
     });
+
+    const nilaiAkhir = parseFloat((totalScore / quizSection.length).toFixed(2));
+
     // update participant status and result
     const participant = await Participant.findOneAndUpdate(
       { report: report._id, user_id },
-      { finished: true, result: { ...results } }
+      { finished: true, result: { ...results }, nilaiAkhir }
     );
   }
 
   // send back to frontend
   return res.status(200).json({ response: "baruSiapUjian" });
+};
+
+// get result
+const getQuizResult = async (req, res) => {
+  const quizToken = req.params.quizToken;
+  const user_id = req.user._id;
+
+  const assignedQuiz = await Report.findOne({ token: quizToken });
+  const participant = await Participant.findOne({
+    user_id,
+    report: assignedQuiz._id,
+  });
+  return res.status(200).json({ assignedQuiz, participant });
 };
 
 module.exports = {

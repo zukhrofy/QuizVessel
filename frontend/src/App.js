@@ -26,6 +26,11 @@ import PlayQuizPreview from "./components/playQuiz/PlayQuizPreview";
 import PlayQuizStart from "./components/playQuiz/PlayQuizStart";
 import PlayQuizResult from "./components/playQuiz/PlayQuizResult";
 
+const RequireAuth = ({ children }) => {
+  const { user } = useAuthContext();
+  return user ? children : <Navigate to="/auth/login" />;
+};
+
 function App() {
   const { user } = useAuthContext();
   return (
@@ -42,24 +47,84 @@ function App() {
       {/* dashboard */}
       <Route
         path="/dashboard"
-        element={user ? <Dashboard /> : <Navigate to="/auth/login" />}>
+        element={
+          <RequireAuth>
+            <Dashboard />
+          </RequireAuth>
+        }>
         <Route path="library" element={<LibraryQuiz />} />
         <Route path="report" element={<ReportQuiz />} />
       </Route>
       {/* create quiz */}
       <Route path="/create">
-        <Route path="regular-quiz" element={<CreateRegularQuiz />} />
-        <Route path="sectioned-quiz" element={<CreateSectionedQuiz />} />
+        <Route
+          path="regular-quiz"
+          element={
+            <RequireAuth>
+              <CreateRegularQuiz />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="sectioned-quiz"
+          element={
+            <RequireAuth>
+              <CreateSectionedQuiz />
+            </RequireAuth>
+          }
+        />
       </Route>
       {/* quiz management component */}
-      <Route path="/dashboard/library/:id/" element={<DetailQuiz />} />
-      <Route path="/dashboard/library/:id/edit" element={<EditQuiz />} />
+      <Route
+        path="/dashboard/library/:id/"
+        element={
+          <RequireAuth>
+            <DetailQuiz />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/dashboard/library/:id/edit"
+        element={
+          <RequireAuth>
+            <EditQuiz />
+          </RequireAuth>
+        }
+      />
       {/* run quiz component */}
-      <Route path="/play/:quizToken/preview" element={<PlayQuizPreview />} />
-      <Route path="/play/:quizToken/start" element={<PlayQuizStart />} />
-      <Route path="/play/:quizToken/finish" element={<PlayQuizResult />} />
+      <Route
+        path="/play/:quizToken/preview"
+        element={
+          <RequireAuth>
+            <PlayQuizPreview />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/play/:quizToken/start"
+        element={
+          <RequireAuth>
+            <PlayQuizStart />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/play/:quizToken/finish"
+        element={
+          <RequireAuth>
+            <PlayQuizResult />
+          </RequireAuth>
+        }
+      />
       {/* report library */}
-      <Route path="/report/:id/" element={<DetailReport />} />
+      <Route
+        path="/report/:id/"
+        element={
+          <RequireAuth>
+            <DetailReport />
+          </RequireAuth>
+        }
+      />
     </Routes>
   );
 }

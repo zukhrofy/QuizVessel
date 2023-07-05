@@ -8,7 +8,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 // import hooks
 import { useSignup } from "../../hooks/useSignup";
 // import from schema
-import { signupSchema } from "./authSchema";
+import { signupSchema } from "../../schemas/authSchema";
 // import local library
 import { useState } from "react";
 

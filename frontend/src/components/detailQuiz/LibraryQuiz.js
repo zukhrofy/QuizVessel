@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import useAuthContext from "../../hooks/useAuthContext";
 // third library
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
+import { id } from "date-fns/locale";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faCopy } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
@@ -11,12 +12,13 @@ import { BarLoader } from "react-spinners";
 import axios from "axios";
 
 const LibraryQuiz = () => {
-  const [quiz, setQuiz] = useState([]);
-  const [loading, setLoading] = useState(true);
-  //   state untuk modal
-  const [selectedQuizId, setSelectedQuizId] = useState(false);
-  const [showModalAsign, setShowModalAssign] = useState(false);
   const { user } = useAuthContext();
+  const [loading, setLoading] = useState(true);
+  const [quiz, setQuiz] = useState([]);
+  // state untuk menyimpan id quiz yang akan diassign
+  const [selectedQuizId, setSelectedQuizId] = useState(false);
+  //   state untuk modal assign quiz
+  const [showModalAsign, setShowModalAssign] = useState(false);
 
   const openAssignModal = (bookId) => {
     setSelectedQuizId(bookId);
@@ -58,9 +60,9 @@ const LibraryQuiz = () => {
         {!loading &&
           quiz.map((quiz) => (
             <Link
-              key={quiz.id}
+              key={quiz._id}
               to={`/dashboard/library/${quiz._id}/`}
-              className="relative bg-white hover:bg-indigo-100 shadow-md">
+              className="bg-white hover:bg-indigo-100 shadow-md">
               {/* body */}
               <div className="p-5">
                 {/* title */}
@@ -71,8 +73,9 @@ const LibraryQuiz = () => {
                 </p>
                 {/* last updated */}
                 <p className="text-gray-600">
-                  Updated{" "}
+                  di update{" "}
                   {formatDistanceToNow(new Date(quiz.updatedAt), {
+                    locale: id,
                     addSuffix: true,
                   })}
                 </p>
@@ -107,6 +110,12 @@ const ModalAssign = ({ setModal, id }) => {
   const { user } = useAuthContext();
   const navigate = useNavigate();
 
+  const minimumDeadline = () => {
+    const today = new Date();
+    const tomorrow = new Date(today.setDate(today.getDate() + 1));
+    return tomorrow.toISOString().split("T")[0];
+  };
+
   const [deadline, setDeadline] = useState("");
 
   // handle assign quiz
@@ -117,7 +126,7 @@ const ModalAssign = ({ setModal, id }) => {
 
     try {
       const response = await axios.post(
-        `/quiz/asign/${id}`,
+        `/quiz/assign/${id}`,
         { deadline },
         {
           headers: {
@@ -134,38 +143,36 @@ const ModalAssign = ({ setModal, id }) => {
   };
 
   return (
-    <>
-      <div className="fixed flex justify-center items-center inset-0 z-50">
-        {/* container */}
-        <div className="rounded-lg shadow-lg bg-white" onSubmit={handleAssign}>
-          {/* upper */}
-          <div className="p-6">
-            <h1>player should complete it before : </h1>
-            <input
-              className="w-full"
-              type="date"
-              required
-              onChange={(e) => setDeadline(e.target.value)}
-            />
-          </div>
-          {/*footer*/}
-          <div className="flex justify-between items-center p-2 border-t border-slate-500">
-            <button
-              onClick={handleAssign}
-              className="px-6 py-2 text-sm font-bold uppercase text-blue-600">
-              Assign
-            </button>
-            <button
-              className="px-6 py-2 text-sm font-bold uppercase text-red-600"
-              type="button"
-              onClick={() => setModal(false)}>
-              Close
-            </button>
-          </div>
+    <div className="fixed flex justify-center items-center inset-0 z-50 bg-black bg-opacity-25">
+      {/* container */}
+      <div className="rounded-lg shadow-lg bg-white">
+        {/* body */}
+        <div className="p-8">
+          <h1>player should complete it before : </h1>
+          <input
+            required
+            className="w-full"
+            type="date"
+            min={minimumDeadline()}
+            onChange={(e) => setDeadline(e.target.value)}
+          />
+        </div>
+        {/*footer*/}
+        <div className="flex justify-between p-2 border-t border-black">
+          <button
+            onClick={handleAssign}
+            className="px-6 py-2 text-sm font-bold uppercase text-blue-600">
+            Assign
+          </button>
+          <button
+            className="px-6 py-2 text-sm font-bold uppercase text-red-600"
+            type="button"
+            onClick={() => setModal(false)}>
+            Close
+          </button>
         </div>
       </div>
-      <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
-    </>
+    </div>
   );
 };
 

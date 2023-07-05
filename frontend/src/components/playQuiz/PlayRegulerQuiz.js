@@ -1,10 +1,10 @@
 // local library
 import { useEffect, useState } from "react";
-// use context hook
-import { useAuthContext } from "../../contexts/authContext";
 // third library
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+// use context hook
+import { useAuthContext } from "../../contexts/authContext";
 
 const PlayRegulerQuiz = ({ quiz, quizToken }) => {
   const { user } = useAuthContext();
@@ -25,7 +25,7 @@ const PlayRegulerQuiz = ({ quiz, quizToken }) => {
     }));
   };
 
-  // handle event ketika submit
+  // handle event ketika submit quiz
   const handleSubmit = async () => {
     try {
       const response = await axios.post(
@@ -39,23 +39,20 @@ const PlayRegulerQuiz = ({ quiz, quizToken }) => {
       );
 
       if (response.status === 200) {
-        const data = await response.data;
-        if (data.response === "baruSiapUjian") {
-          // navigate to halaman selesai
-          return navigate(`/play/${quizToken}/finish`);
-        }
+        return navigate(`/play/${quizToken}/finish`);
       }
     } catch (err) {
       console.log(err.response.data.error);
     }
   };
 
-  // event tombol submit
+  // event tombol submit untuk show modal
   const handleLeavePage = (e) => {
     e.preventDefault();
     setShowConfirmation(true);
   };
 
+  // jika setuju submit
   const handleConfirmSubmit = () => {
     handleSubmit();
     setShowConfirmation(false);
@@ -76,6 +73,7 @@ const PlayRegulerQuiz = ({ quiz, quizToken }) => {
 
   // use effect ketika waktu habis
   useEffect(() => {
+    console.log("run pengecekan timer");
     if (remainingTime <= 0) {
       handleSubmit();
     }
@@ -87,60 +85,70 @@ const PlayRegulerQuiz = ({ quiz, quizToken }) => {
       e.preventDefault();
     };
 
-    const handleUnload = () => {
-      handleSubmit();
-    };
-
     window.addEventListener("beforeunload", handleBeforeUnload);
-    window.addEventListener("unload", handleUnload);
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      window.removeEventListener("unload", handleUnload);
     };
   }, []);
 
-  // format deadline to timer
-  const hours = Math.floor(remainingTime / 3600);
-  const minutes = Math.floor((remainingTime % 3600) / 60);
-  const remainingSeconds = remainingTime % 60;
-  const formattedTime = `${String(hours).padStart(2, "0")}:${String(
-    minutes
-  ).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
+  // helper function untuk ui timer
+  const formatTime = (time) => {
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor((time % 3600) / 60);
+    const seconds = time % 60;
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
+      2,
+      "0"
+    )}:${String(seconds).padStart(2, "0")}`;
+  };
 
-  // proggress bar
-  const answeredQuestions = Object.keys(responses).length;
-  const totalQuestions = quiz.questions.length;
-  const progress =
-    answeredQuestions > 0
+  // helper function untuk ui progress
+  const progress = () => {
+    const totalQuestions = quiz.questions.length;
+    const answeredQuestions = Object.keys(responses).length;
+    return answeredQuestions > 0
       ? Math.round((answeredQuestions / totalQuestions) * 100)
       : 0;
+  };
+
+  // helper function untuk mendapatkan abjad option
+  const answerLetter = (index) => {
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    return letters[index];
+  };
   return (
     <>
-      <div className="grid grid-cols-[auto,1fr] min-h-screen">
-        {/* question list sidebar */}
+      <div className="h-screen flex">
+        {/* sidebar */}
         <aside className="h-full p-4 bg-stone-300 overflow-y-auto">
-          <h2 className="mb-4 text-2xl text-center font-bold">{quiz.title}</h2>
-          <div className="mb-4 text-center text-4xl font-bold">
-            {formattedTime}
+          {/* title */}
+          <h2 className="mb-4 text-3xl text-center font-bold">{quiz.title}</h2>
+          {/* timer */}
+          <div className="mb-4 text-4xl font-bold text-center">
+            {formatTime(remainingTime)}
           </div>
           {/* progress indicator */}
           <div className="flex items-center mb-4 gap-2">
-            <div className="flex-grow h-2 bg-gray-300">
+            <div className="grow h-2 bg-gray-400">
               <div
                 className="h-full bg-blue-500"
-                style={{ width: `${progress}%` }}></div>
+                style={{ width: `${progress()}%` }}
+              />
             </div>
-            <div className="text-gray-600">{`${progress}% completed`}</div>
+            <div className="text-gray-600">{`${progress()}% completed`}</div>
           </div>
           {/* question pointer */}
           <div className="grid grid-cols-5 gap-3 p-3 bg-white shadow-md">
             {quiz.questions.map((question, questionIndex) => (
               <div
                 key={question.questionIndex}
-                className={`flex justify-center p-4 border border-slate-500 ${
+                className={`p-3 border border-slate-400 cursor-pointer ${
                   responses.hasOwnProperty(questionIndex) &&
-                  "bg-green-400 border-0"
-                }`}>
+                  "bg-green-400 border-white text-white"
+                }`}
+                onClick={() => {
+                  document.getElementById(`${questionIndex}`).scrollIntoView();
+                }}>
                 <span className="text-sm font-semibold">
                   {questionIndex + 1}
                 </span>
@@ -149,11 +157,12 @@ const PlayRegulerQuiz = ({ quiz, quizToken }) => {
           </div>
         </aside>
         {/* main part */}
-        <div className="p-5 overflow-y-auto bg-stone-100">
+        <div className="grow p-5 bg-stone-100 overflow-y-auto">
           {/* questions */}
           {quiz.questions.map((question, questionIndex) => (
             <div
               key={questionIndex}
+              id={questionIndex}
               className="mb-2 p-5 bg-white border shadow-lg">
               {/* question text */}
               <h2 className="mb-2 text-xl font-bold">
@@ -163,7 +172,10 @@ const PlayRegulerQuiz = ({ quiz, quizToken }) => {
               <ul className="space-y-1">
                 {question.answer.map((option, optionIndex) => (
                   <li key={optionIndex}>
-                    <label className="flex items-center gap-2">
+                    <div className="flex items-center ml-5 gap-2">
+                      <span className="font-medium">
+                        {answerLetter(optionIndex)}
+                      </span>
                       <input
                         type="radio"
                         value={optionIndex}
@@ -171,7 +183,7 @@ const PlayRegulerQuiz = ({ quiz, quizToken }) => {
                         onChange={handleAnswerChange}
                       />
                       <span>{option}</span>
-                    </label>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -187,7 +199,7 @@ const PlayRegulerQuiz = ({ quiz, quizToken }) => {
       </div>
       {showConfirmation && (
         <ConfirmDialog
-          message="Are you sure you want to leave the page?"
+          message="Apa kamu yakin ingin submit?"
           onConfirm={handleConfirmSubmit}
           onCancel={handleCancelSubmit}
         />
@@ -196,20 +208,21 @@ const PlayRegulerQuiz = ({ quiz, quizToken }) => {
   );
 };
 
+// confirm dialog saat user submit
 const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50">
-      <div className="bg-white rounded-lg p-6">
-        <p className="text-lg">{message}</p>
-        <div className="mt-4 flex justify-end gap-2">
+      <div className="p-6 bg-white rounded-lg">
+        <p className="mb-4 text-lg">{message}</p>
+        <div className="flex justify-between">
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-100">
+            className="px-4 py-2 text-gray-600 bg-white hover:bg-gray-100 border border-gray-300 rounded">
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600">
+            className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded">
             Confirm
           </button>
         </div>

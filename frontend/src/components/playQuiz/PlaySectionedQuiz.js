@@ -27,20 +27,14 @@ const PlaySectionedQuiz = ({ quiz, quizToken }) => {
       );
 
       if (response.status === 200) {
-        // take response data
-        const data = await response.data;
-        // jika quiz marked as finished or pass the deadlin
-        if (data.response === "baruSiapUjian") {
-          // navigate to preview page
-          return navigate(`/play/${quizToken}/finish`);
-        }
+        return navigate(`/play/${quizToken}/finish`);
       }
     } catch (err) {
-      console.log(err);
+      console.log(err.response.data.error);
     }
   };
 
-  // Set remaining time for each section
+  // Set remaining time for each section, berjalan setiap perubahan index section
   useEffect(() => {
     const currentSection = section[currentSectionIndex];
     // convert minute to second for time interval function
@@ -61,7 +55,7 @@ const PlaySectionedQuiz = ({ quiz, quizToken }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [section, currentSectionIndex]);
+  }, [currentSectionIndex]);
 
   // change section manually or triggered when time section is 0
   const handleNextSection = () => {
@@ -69,7 +63,6 @@ const PlaySectionedQuiz = ({ quiz, quizToken }) => {
       setCurrentSectionIndex((prevIndex) => prevIndex + 1);
     } else {
       // Quiz finished
-      console.log("Quiz finished");
       handleSubmit();
     }
   };
@@ -87,59 +80,91 @@ const PlaySectionedQuiz = ({ quiz, quizToken }) => {
     }));
   };
 
-  // function untuk format waktu timer
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
+  // use effect ketika ingin refresh (belum bekerja)
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
+  //helper function untuk format waktu timer
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const remainingSeconds = time % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
-  // untuk progress section
-  const answeredQuestions = userResponse[currentSectionIndex]
-    ? Object.keys(userResponse[currentSectionIndex]).length
-    : 0;
-  const totalQuestions = section[currentSectionIndex].questionSet.length;
-  const progress =
-    answeredQuestions > 0
-      ? Math.round((answeredQuestions / totalQuestions) * 100)
+  // helper function untuk progress section
+  const progress = () => {
+    const answeredQuestions = userResponse[currentSectionIndex]
+      ? Object.keys(userResponse[currentSectionIndex]).length
       : 0;
+    const totalQuestions = section[currentSectionIndex].questionSet.length;
+    const progress =
+      answeredQuestions > 0
+        ? Math.round((answeredQuestions / totalQuestions) * 100)
+        : 0;
+    return progress;
+  };
+
+  // helper function untuk mendapatkan abjad option
+  const answerLetter = (index) => {
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    return letters[index];
+  };
 
   return (
     <>
-      <div className="grid grid-cols-[auto,1fr] min-h-screen bg-gray-100">
-        <aside className="h-full p-3 bg-slate-200">
-          <h2 className="mb-1 text-3xl text-center font-bold">
-            {quiz.namaQuiz}
+      <div className="h-screen flex">
+        {/* sidebar */}
+        <aside className="h-full p-4 bg-stone-300 overflow-y-auto">
+          {/* title */}
+          <h2 className="mb-5 text-3xl text-center font-bold">{quiz.title}</h2>
+          {/* section number and title */}
+          <h2 className="text-xl text-center font-semibold">
+            Section {currentSectionIndex + 1}
           </h2>
-          <h2 className="text-2xl text-center font-bold">
-            Section {currentSectionIndex + 1}{" "}
-          </h2>
-          <h2 className="mb-4 text-2xl text-center font-bold">
+          <h2 className="mb-4 text-xl text-center font-medium">
             {section[currentSectionIndex].sectionTitle}
           </h2>
-          {/* remaining time */}
-          <div className="mb-4 text-center text-4xl font-bold">
+          {/* timer */}
+          <div className="mb-4 text-4xl font-bold text-center">
             {formatTime(remainingTime)}
           </div>
           {/* progress indicator */}
-          <div className="flex items-center mb-4">
-            <div className="flex-grow h-2 bg-gray-200">
+          <div className="flex items-center mb-4 gap-2">
+            {/* bar indicator */}
+            <div className="grow h-2 bg-gray-400">
               <div
                 className="h-full bg-blue-500"
-                style={{ width: `${progress}%` }}></div>
+                style={{ width: `${progress()}%` }}
+              />
             </div>
-            <div className="ml-2 text-gray-600">{`${progress}% completed`}</div>
+            <div className="text-gray-600">{`${progress()}% completed`}</div>
           </div>
-          <div className="grid grid-cols-5 p-3 gap-3 border border-slate-500">
+          {/* section question pointer */}
+          <div className="grid grid-cols-5 gap-3 p-3 bg-white shadow-md">
             {section[currentSectionIndex].questionSet.map(
               (question, questionIndex) => (
                 <div
-                  key={`${currentSectionIndex}-${questionIndex}`}
-                  className={`flex justify-center p-2 border border-slate-500 ${
+                  key={`pointer-${currentSectionIndex}-${questionIndex}`}
+                  className={`p-3 border border-slate-400 cursor-pointer ${
                     userResponse[currentSectionIndex]?.hasOwnProperty(
                       questionIndex
-                    ) && "bg-green-500"
-                  }`}>
+                    ) && "bg-green-400 border-white text-white"
+                  }`}
+                  onClick={() =>
+                    document
+                      .getElementById(
+                        `section-${currentSectionIndex}-question-${questionIndex}`
+                      )
+                      .scrollIntoView()
+                  }>
                   <span className="text-sm font-semibold">
                     {questionIndex + 1}
                   </span>
@@ -148,13 +173,15 @@ const PlaySectionedQuiz = ({ quiz, quizToken }) => {
             )}
           </div>
         </aside>
-        <div className="p-4">
+        {/* main part */}
+        <div className="grow p-5 bg-stone-100 overflow-y-auto">
           {/* questions */}
           {section[currentSectionIndex].questionSet.map(
             (question, questionIndex) => (
               <div
-                key={`${currentSectionIndex}-${questionIndex}`}
-                className="mb-2 p-4 border border-slate-400">
+                key={`soal-${currentSectionIndex}-${questionIndex}`}
+                id={`section-${currentSectionIndex}-question-${questionIndex}`}
+                className="mb-2 p-5 bg-white border shadow-lg">
                 {/* question text */}
                 <h2 className="mb-2 text-lg font-bold">
                   {questionIndex + 1}. {question.questionText}
@@ -163,7 +190,10 @@ const PlaySectionedQuiz = ({ quiz, quizToken }) => {
                 <ul className="space-y-1">
                   {question.answer.map((option, optionIndex) => (
                     <li key={optionIndex}>
-                      <label className="flex items-center space-x-2">
+                      <div className="flex items-center ml-5 gap-2">
+                        <span className="font-medium">
+                          {answerLetter(optionIndex)}
+                        </span>
                         <input
                           type="radio"
                           value={optionIndex}
@@ -177,7 +207,7 @@ const PlaySectionedQuiz = ({ quiz, quizToken }) => {
                           }
                         />
                         <span>{option}</span>
-                      </label>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -185,8 +215,8 @@ const PlaySectionedQuiz = ({ quiz, quizToken }) => {
             )
           )}
           <button
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-            onClick={handleNextSection}>
+            onClick={handleNextSection}
+            className="mt-4 px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded">
             Next Section
           </button>
         </div>

@@ -25,29 +25,21 @@ const userSchema = new Schema(
 
 // static signup method
 userSchema.statics.signup = async function (email, username, password) {
-  console.log(email);
-  console.log(username);
-  console.log(password);
-  console.log("static method signup");
   // check if email exists
   const emailExists = await this.findOne({ email });
   if (emailExists) {
-    console.log("email exist");
     throw Error("Email already in use");
   }
 
   const usernameExists = await this.findOne({ username });
   if (usernameExists) {
-    console.log("username exist");
     throw Error("username already in use");
   }
   // salt and hash password
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
   // create user
-  console.log("create user");
   const user = await this.create({ email, username, password: hash });
-  console.log(user);
   return user;
 };
 

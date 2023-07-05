@@ -7,8 +7,8 @@ import useAuthContext from "../../hooks/useAuthContext";
 // import local library
 import { useEffect, useState } from "react";
 // import component
-import { EditRegularQuiz } from "./EditRegularQuiz";
-import { EditSectionedQuiz } from "./EditSectionedQuiz";
+import EditRegularQuiz from "./EditRegularQuiz";
+import EditSectionedQuiz from "./EditSectionedQuiz";
 
 const EditQuiz = () => {
   const [quiz, setQuiz] = useState({});
@@ -49,9 +49,11 @@ const EditQuiz = () => {
           <RingLoader color="#007BFF" loading={loading} size={150} />
         </div>
       )}
-      {!loading && quizType === "regular" && <EditRegularQuiz quiz={quiz} />}
-      {!loading && quizType === "sectioned" && (
-        <EditSectionedQuiz quiz={quiz} />
+      {!loading && (
+        <>
+          {quizType === "regular" && <EditRegularQuiz quiz={quiz} />}
+          {quizType === "sectioned" && <EditSectionedQuiz quiz={quiz} />}
+        </>
       )}
     </>
   );

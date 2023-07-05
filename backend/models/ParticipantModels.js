@@ -5,28 +5,22 @@ const Schema = mongoose.Schema;
 
 const ParticipantSchema = new Schema({
   user_id: {
-    type: String,
-  },
-  start_time: {
-    type: String,
-  },
-  end_time: {
-    type: String,
-  },
-  personalDeadline: {
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
   },
   finished: {
     type: Boolean,
     default: false,
+    required: true,
   },
   result: {
     type: Object,
   },
   nilaiAkhir: {
-    type: Schema.Types.Mixed,
+    type: Number,
   },
-  report: { type: Schema.Types.ObjectId, ref: "Report" },
+  report: { type: Schema.Types.ObjectId, ref: "Report", required: true },
 });
 
 module.exports = mongoose.model("Participant", ParticipantSchema);

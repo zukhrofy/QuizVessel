@@ -201,7 +201,7 @@ const Feature = () => {
               </h3>
               <p className="text-sm leading-6 text-gray-600">
                 pilihan quiz untuk membantu pengguna mengembangkan kemampuan
-                untuk mengatur waktu dan keputusan peserta secara efektif.
+                mengelola waktu dan keputusan peserta secara efektif.
               </p>
             </div>
             {/* image feature */}

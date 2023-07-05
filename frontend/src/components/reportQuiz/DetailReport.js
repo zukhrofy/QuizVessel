@@ -13,8 +13,8 @@ import DetailSectionedReport from "./DetailSectionedReport";
 const DetailReport = () => {
   const { id } = useParams();
   const { user } = useAuthContext();
-  const [report, setReport] = useState({});
   const [loading, setLoading] = useState(true);
+  const [report, setReport] = useState({});
 
   useEffect(() => {
     // get all report that assigned
@@ -45,15 +45,19 @@ const DetailReport = () => {
   return (
     <>
       {loading && (
-        <div className="h-full w-full flex justify-center items-center">
+        <div className="h-screen w-full flex justify-center items-center">
           <RingLoader color="#007BFF" loading={loading} size={150} />
         </div>
       )}
-      {!loading && report.quiz_type === "regular" && (
-        <DetailRegularReport report={report} />
-      )}
-      {!loading && report.quiz_type === "sectioned" && (
-        <DetailSectionedReport report={report} />
+      {!loading && (
+        <>
+          {report.quiz_type === "regular" && (
+            <DetailRegularReport report={report} />
+          )}
+          {report.quiz_type === "sectioned" && (
+            <DetailSectionedReport report={report} />
+          )}
+        </>
       )}
     </>
   );
