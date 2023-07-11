@@ -12,6 +12,8 @@ import {
   faCopy,
   faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.bubble.css";
 
 const DetailSectionedQuiz = ({ quiz }) => {
   // state untuk modal
@@ -96,7 +98,7 @@ const DetailSectionedQuiz = ({ quiz }) => {
               <div className="flex items-center gap-3">
                 {/* section time limit */}
                 <div className="text-xl font-semibold">
-                  section time limit : {section.sectionTimeLimit} menit
+                  {section.sectionTimeLimit} menit
                 </div>
                 <Icon
                   icon={showSection[sectionIndex] ? faChevronUp : faChevronDown}
@@ -108,25 +110,32 @@ const DetailSectionedQuiz = ({ quiz }) => {
                 {/* pertanyaan */}
                 {section.questionSet.map((pertanyaan, pertanyaanIndex) => (
                   <div
-                    className="mt-3 py-4 px-6 border border-slate-400 cursor-pointer"
+                    className="mt-3 px-6 py-4 bg-slate-100 border border-slate-400 cursor-pointer"
                     key={pertanyaanIndex}
                     onClick={() =>
                       toggleOptions(sectionIndex, pertanyaanIndex)
                     }>
-                    {/* question text */}
-                    <div className="flex justify-between mb-1 font-medium">
-                      <span>
-                        {pertanyaanIndex + 1}. {pertanyaan.questionText}
-                      </span>
+                    {/* nomor soal dan toggle */}
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="text-xl font-semibold">
+                        Pertanyaan {pertanyaanIndex + 1}
+                      </div>
                       <Icon
                         icon={
-                          showOptions[pertanyaanIndex]
+                          showOptions[sectionIndex]?.[pertanyaanIndex]
                             ? faChevronUp
                             : faChevronDown
                         }
                         className="text-blue-500"
                       />
                     </div>
+                    {/* question text */}
+                    <ReactQuill
+                      value={pertanyaan.questionText}
+                      theme="bubble"
+                      readOnly
+                      className="mb-2 p-2 bg-white border border-slate-500"
+                    />
                     {/* option */}
                     {showOptions[sectionIndex] &&
                       showOptions[sectionIndex][pertanyaanIndex] &&
@@ -140,9 +149,15 @@ const DetailSectionedQuiz = ({ quiz }) => {
                           <div
                             className={`grow flex justify-between items-center p-3 border border-slate-400 ${
                               pertanyaan.correctAnswer.toString() ===
-                                answerIndex.toString() && "bg-green-300"
+                              answerIndex.toString()
+                                ? "bg-green-300"
+                                : "bg-white"
                             }`}>
-                            <span>{answer}</span>
+                            <ReactQuill
+                              value={answer}
+                              theme="bubble"
+                              readOnly
+                            />
                             {pertanyaan.correctAnswer.toString() ===
                               answerIndex.toString() && (
                               <span className="text-black">&#10004;</span>

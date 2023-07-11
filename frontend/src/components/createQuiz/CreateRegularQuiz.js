@@ -2,9 +2,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ClipLoader from "react-spinners/ClipLoader";
-import { useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import TextareaAutosize from "react-textarea-autosize";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 // use context hooks
 import useAuthContext from "../../hooks/useAuthContext";
 // yup schema and default value
@@ -29,16 +30,6 @@ const CreateRegularQuiz = () => {
 
   const navigate = useNavigate();
   const { user } = useAuthContext();
-
-  // array of question config
-  const {
-    fields: questionFields,
-    append: appendQuestion,
-    remove: removeQuestion,
-  } = useFieldArray({
-    control,
-    name: "questions",
-  });
 
   // onsubmit event
   const onSubmit = async (data) => {
@@ -66,6 +57,25 @@ const CreateRegularQuiz = () => {
   };
 
   const onError = (err) => console.log(err);
+
+  // array of question config
+  const {
+    fields: questionFields,
+    append: appendQuestion,
+    remove: removeQuestion,
+  } = useFieldArray({
+    control,
+    name: "questions",
+  });
+
+  // module for react-quill
+  const quillQuestionModules = {
+    toolbar: [
+      ["bold", "italic", "underline", "strike"],
+      [{ script: "sub" }, { script: "super" }],
+      [{ list: "ordered" }, { list: "bullet" }],
+    ],
+  };
 
   return (
     // container
@@ -146,16 +156,22 @@ const CreateRegularQuiz = () => {
                   )}
                 </div>
                 {/* question text */}
-                <TextareaAutosize
-                  {...register(`questions.${index}.questionText`)}
-                  minRows={1}
-                  maxRows={5}
-                  className={`w-full p-4 rounded ${
-                    errors.questions?.[index]?.questionText
-                      ? "border border-red-400"
-                      : "border-0"
-                  }`}
-                  placeholder="Type your question.."
+                <Controller
+                  control={control}
+                  name={`questions.${index}.questionText`}
+                  render={({ field }) => (
+                    <ReactQuill
+                      className={`bg-white ${
+                        errors.questions?.[index]?.questionText
+                          ? "border border-red-400"
+                          : "border-0"
+                      }`}
+                      placeholder="Type your question.."
+                      value={field.value}
+                      onChange={field.onChange}
+                      modules={quillQuestionModules}
+                    />
+                  )}
                 />
                 {/* question text error */}
                 <span className="text-sm text-red-400">
@@ -256,24 +272,37 @@ const NestedAnswer = ({ questionIndex, control, register, errors }) => {
     return letters[index];
   };
 
+  const quillAnswerModules = {
+    toolbar: [
+      ["bold", "italic", "underline", "strike"],
+      [{ script: "sub" }, { script: "super" }],
+    ],
+  };
+
   return (
     <div className="py-4">
       {answerField.map((answer, answerIndex) => (
         <div key={answer.id}>
           <div className="flex items-center">
             {/* letter */}
-            <span>{answerLetter(answerIndex)}</span>
+            <span className="mr-4">{answerLetter(answerIndex)}</span>
             {/* answer text */}
-            <TextareaAutosize
-              {...register(`questions.${questionIndex}.answer.${answerIndex}`)}
-              minRows={1}
-              maxRows={4}
-              className={`w-1/2 ml-4 px-4 py-3 rounded ${
-                errors.questions?.[questionIndex]?.answer?.[answerIndex]
-                  ? "border border-red-400"
-                  : "border-0"
-              }`}
-              placeholder={`option ${answerIndex + 1}`}
+            <Controller
+              control={control}
+              name={`questions.${questionIndex}.answer.${answerIndex}`}
+              render={({ field }) => (
+                <ReactQuill
+                  className={`w-1/2 bg-white ${
+                    errors.questions?.[questionIndex]?.answer?.[answerIndex]
+                      ? "border border-red-400"
+                      : "border-0"
+                  }`}
+                  placeholder="Type your answer.."
+                  value={field.value}
+                  onChange={field.onChange}
+                  modules={quillAnswerModules}
+                />
+              )}
             />
             {/* input radio untuk correct answer */}
             <div>
@@ -301,7 +330,7 @@ const NestedAnswer = ({ questionIndex, control, register, errors }) => {
             )}
             {/* error ketika tidak ada jawaban benar yang dipilih */}
             {answerIndex === 0 && (
-              <div className="text-sm text-red-400">
+              <div className="ml-4 text-sm text-red-400">
                 {errors.questions?.[questionIndex]?.correctAnswer?.message}
               </div>
             )}

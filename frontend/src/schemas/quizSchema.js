@@ -13,10 +13,26 @@ export const regularSchema = yup
       .array(
         yup.object({
           questionId: yup.string(),
-          questionText: yup.string().required("pertanyaan tidak boleh kosong"),
+          questionText: yup
+            .string()
+            .test(
+              "notEmpty",
+              "pertanyaan tidak boleh kosong",
+              (value) => value !== "<p><br></p>"
+            )
+            .required("pertanyaan tidak boleh kosong"),
           answer: yup
             .array()
-            .of(yup.string().required("option tidak boleh kosong"))
+            .of(
+              yup
+                .string()
+                .test(
+                  "notEmpty",
+                  "option tidak boleh kosong",
+                  (value) => value !== "<p><br></p>"
+                )
+                .required("option tidak boleh kosong")
+            )
             .required()
             .min(2, "minimal dua option jawaban!"),
           correctAnswer: yup
@@ -66,10 +82,24 @@ export const sectionedSchema = yup
                 questionId: yup.string(),
                 questionText: yup
                   .string()
+                  .test(
+                    "notEmpty",
+                    "pertanyaan tidak boleh kosong",
+                    (value) => value !== "<p><br></p>"
+                  )
                   .required("pertanyaan tidak boleh kosong"),
                 answer: yup
                   .array()
-                  .of(yup.string().required("option tidak boleh kosong"))
+                  .of(
+                    yup
+                      .string()
+                      .test(
+                        "notEmpty",
+                        "option tidak boleh kosong",
+                        (value) => value !== "<p><br></p>"
+                      )
+                      .required("option tidak boleh kosong")
+                  )
                   .required()
                   .min(2, "minimal dua option jawaban!"),
                 correctAnswer: yup

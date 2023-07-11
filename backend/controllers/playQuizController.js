@@ -13,7 +13,7 @@ const getPlayQuizDetail = async (req, res) => {
   // check ketersediaan quiz
   const isFinished = assignedQuiz.finished;
   if (isFinished) {
-    res.status(403).json({ isFinished });
+    return res.status(403).json({ isFinished });
   }
 
   res.status(200).json(assignedQuiz);
@@ -93,7 +93,10 @@ const processSubmit = async (req, res) => {
       };
     });
 
-    const nilaiAkhir = (score / report.questions.length) * 100;
+    const nilaiAkhir = parseFloat(
+      ((score / report.questions.length) * 100).toFixed(2)
+    );
+
     // update participant status and result
     const participant = await Participant.findOneAndUpdate(
       { report: report._id, user_id },

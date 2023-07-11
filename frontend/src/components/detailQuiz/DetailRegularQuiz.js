@@ -12,6 +12,8 @@ import {
   faCopy,
   faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.bubble.css";
 
 const DetailRegularQuiz = ({ quiz }) => {
   // state untuk modal assign quiz
@@ -65,30 +67,39 @@ const DetailRegularQuiz = ({ quiz }) => {
       {/* right side */}
       <div className="col-span-9 p-5 bg-white overflow-y-auto">
         {quiz.questions.map((element, index) => (
-          <div key={index} className="mb-4 p-4 border border-slate-500">
-            {/* pertanyaan */}
+          <div
+            key={index}
+            className="mb-4 p-4 bg-slate-100 border border-slate-500">
+            {/* nomor soal dan toggle */}
             <div
-              className="flex justify-between items-center pb-1 border-b border-slate-300 cursor-pointer"
+              className="flex justify-between items-center mb-3 cursor-pointer"
               onClick={() => toggleOptions(index)}>
-              <span className="text-xl font-semibold">
-                Question {index + 1} : {element.questionText}
-              </span>
+              <div className="text-xl font-semibold">Question {index + 1}</div>
               <Icon icon={showOptions[index] ? faChevronUp : faChevronDown} />
             </div>
+            {/* question text */}
+            <ReactQuill
+              value={element.questionText}
+              theme="bubble"
+              readOnly
+              className="mb-3 bg-white border border-slate-400"
+            />
             {/* options */}
             {showOptions[index] && (
-              <div className="mt-2 p-2">
+              <div>
                 {element.answer.map((answer, answerIndex) => (
                   <div key={answerIndex} className="flex items-center gap-2">
                     {/* letter */}
                     <span>{answerLetter(answerIndex)}</span>
                     {/* answer option */}
                     <div
-                      className={`grow flex justify-between items-center p-3 border border-slate-400 ${
+                      className={`grow flex justify-between items-center p-2 border border-slate-400 ${
                         element.correctAnswer.toString() ===
-                          answerIndex.toString() && "bg-green-300"
+                        answerIndex.toString()
+                          ? "bg-green-300"
+                          : "bg-white"
                       }`}>
-                      <span>{answer}</span>
+                      <ReactQuill value={answer} theme="bubble" readOnly />
                       {element.correctAnswer.toString() ===
                         answerIndex.toString() && (
                         <span className="text-black">&#10004;</span>

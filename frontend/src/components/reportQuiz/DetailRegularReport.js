@@ -4,42 +4,41 @@ import { useState } from "react";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import { useTable, useSortBy } from "react-table";
+import ReactQuill from "react-quill";
 
 const DetailRegularReport = ({ report }) => {
   const participants = report.participant;
 
   return (
-    <>
-      <div className="min-h-screen px-32 py-10 bg-slate-200">
-        {/* nama quiz */}
-        <h1 className="my-4 text-3xl font-bold">
-          Quiz {report.quiz_type} ({report.title})
-        </h1>
-        {/* overall quiz statistic */}
-        <OverallQuizStatistic participants={participants} />
-        {/* tabs */}
-        <Tabs>
-          <TabList className="mb-2">
-            <Tab>Detail Peserta</Tab>
-            <Tab>Analisa Pertanyaan</Tab>
-          </TabList>
-          {/* tab detail peserta */}
-          <TabPanel>
-            <ParticipantDetailTab
-              participants={participants}
-              questionsDetail={report.questions}
-            />
-          </TabPanel>
-          {/* tab analisis pertanyaan */}
-          <TabPanel>
-            <QuestionAnalysisTab
-              participants={participants}
-              questionsDetail={report.questions}
-            />
-          </TabPanel>
-        </Tabs>
-      </div>
-    </>
+    <div className="min-h-screen px-32 py-10 bg-slate-200">
+      {/* nama quiz */}
+      <h1 className="my-4 text-3xl font-bold">
+        Quiz {report.quiz_type} ({report.title})
+      </h1>
+      {/* overall quiz statistic */}
+      <OverallQuizStatistic participants={participants} />
+      {/* tabs */}
+      <Tabs>
+        <TabList className="mb-2">
+          <Tab>Detail Peserta</Tab>
+          <Tab>Analisa Pertanyaan</Tab>
+        </TabList>
+        {/* tab detail peserta */}
+        <TabPanel>
+          <ParticipantDetailTab
+            participants={participants}
+            questionsDetail={report.questions}
+          />
+        </TabPanel>
+        {/* tab analisis pertanyaan */}
+        <TabPanel>
+          <QuestionAnalysisTab
+            participants={participants}
+            questionsDetail={report.questions}
+          />
+        </TabPanel>
+      </Tabs>
+    </div>
   );
 };
 
@@ -189,6 +188,9 @@ const QuestionAnalysisTab = ({ participants, questionsDetail }) => {
     {
       Header: "question",
       accessor: "question",
+      Cell: ({ row }) => (
+        <ReactQuill value={row.original.question} theme="bubble" readOnly />
+      ),
     },
     {
       Header: "persentase jawaban benar",
@@ -321,12 +323,24 @@ const ResultModal = ({
                         {questionIndex + 1}
                       </td>
                       <td className="px-4 py-2 border border-slate-500">
-                        {question.questionText}
+                        <ReactQuill
+                          value={question.questionText}
+                          theme="bubble"
+                          readOnly
+                        />
                       </td>
                       <td className="px-4 py-2 border border-slate-500">
-                        {questionAnswer.selectedAnswer
-                          ? question.answer[questionAnswer.selectedAnswer]
-                          : "Tidak dijawab"}
+                        {questionAnswer.selectedAnswer ? (
+                          <ReactQuill
+                            value={
+                              question.answer[questionAnswer.selectedAnswer]
+                            }
+                            theme="bubble"
+                            readOnly
+                          />
+                        ) : (
+                          "Tidak dijawab"
+                        )}
                       </td>
                       <td
                         className={`px-4 py-2 border border-slate-500 ${

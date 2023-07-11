@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import { useSortBy, useTable } from "react-table";
+import ReactQuill from "react-quill";
 
 const SectionedQuizReport = ({ report }) => {
   const participants = report.participant;
@@ -444,15 +445,30 @@ const ResultModal = ({
                       return (
                         <tr key={questionId} className="text-sm">
                           <td className="px-4 py-2 border border-slate-500">
-                            {section.questionSet[questionId].questionText}
+                            <ReactQuill
+                              value={
+                                section.questionSet[questionId].questionText
+                              }
+                              theme="bubble"
+                              readOnly
+                            />
                           </td>
                           <td className="px-4 py-2 border border-slate-500">
-                            {participantSectionAnswer[questionId].selectedAnswer
-                              ? section.questionSet[questionId].answer[
-                                  participantSectionAnswer[questionId]
-                                    .selectedAnswer
-                                ]
-                              : "tidak dijawab"}
+                            {participantSectionAnswer[questionId]
+                              .selectedAnswer ? (
+                              <ReactQuill
+                                value={
+                                  section.questionSet[questionId].answer[
+                                    participantSectionAnswer[questionId]
+                                      .selectedAnswer
+                                  ]
+                                }
+                                theme="bubble"
+                                readOnly
+                              />
+                            ) : (
+                              "tidak dijawab"
+                            )}
                           </td>
                           <td
                             className={`px-4 py-2 border border-slate-500 ${

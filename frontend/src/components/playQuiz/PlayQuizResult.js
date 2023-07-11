@@ -6,6 +6,7 @@ import useAuthContext from "../../hooks/useAuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { RingLoader } from "react-spinners";
+import ReactQuill from "react-quill";
 
 const PlayQuizResult = () => {
   const [loading, setLoading] = useState(true);
@@ -72,16 +73,25 @@ const PlayQuizResult = () => {
                     isCorrect ? "bg-green-200" : "bg-red-200"
                   }`}>
                   <span className="font-semibold">{questionIndex + 1}.</span>
-                  <span>
-                    Jawaban yang dipilih:{" "}
-                    {selectedAnswer
-                      ? quiz.questions[questionIndex].answer[selectedAnswer]
-                      : "tidak dijawab"}
-                  </span>
+                  <div className="grow">
+                    <span>Jawaban yang dipilih:</span>
+                    {selectedAnswer ? (
+                      <ReactQuill
+                        value={
+                          quiz.questions[questionIndex].answer[selectedAnswer]
+                        }
+                        theme="bubble"
+                        className="bg-white"
+                        readOnly
+                      />
+                    ) : (
+                      <span>"tidak dijawab"</span>
+                    )}
+                  </div>
                   {isCorrect ? (
-                    <span className="text-green-500">&#10004;</span>
+                    <span className="text-green-500 text-3xl">&#10004;</span>
                   ) : (
-                    <span className="text-red-500">x</span>
+                    <span className="text-red-500 text-3xl">x</span>
                   )}
                 </div>
               );
@@ -131,17 +141,28 @@ const PlayQuizResult = () => {
                         <span className="font-semibold">
                           {Number(questionId) + 1}.
                         </span>
-                        <span>
-                          Jawaban yang dipilih:{" "}
-                          {selectedAnswer
-                            ? quiz.sections[sectionId].questionSet[questionId]
-                                .answer[selectedAnswer]
-                            : "tidak dijawab"}
-                        </span>
+                        <div className="grow">
+                          <span>Jawaban yang dipilih:</span>
+                          {selectedAnswer ? (
+                            <ReactQuill
+                              value={
+                                quiz.sections[sectionId].questionSet[questionId]
+                                  .answer[selectedAnswer]
+                              }
+                              theme="bubble"
+                              className="bg-white"
+                              readOnly
+                            />
+                          ) : (
+                            <span>"tidak dijawab"</span>
+                          )}
+                        </div>
                         {isCorrect ? (
-                          <span className="text-green-500">&#10004;</span>
+                          <span className="text-green-500 text-3xl">
+                            &#10004;
+                          </span>
                         ) : (
-                          <span className="text-red-500">x</span>
+                          <span className="text-red-500 text-3xl">x</span>
                         )}
                       </div>
                     );

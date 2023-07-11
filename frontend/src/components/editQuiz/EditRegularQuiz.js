@@ -2,9 +2,10 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import ClipLoader from "react-spinners/ClipLoader";
-import { useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import TextareaAutosize from "react-textarea-autosize";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 // use context hooks
 import useAuthContext from "../../hooks/useAuthContext";
 // import yup schema and default value
@@ -70,6 +71,15 @@ const EditRegularQuiz = ({ quiz }) => {
     name: "questions",
   });
 
+  // module for react-quill
+  const quillQuestionModules = {
+    toolbar: [
+      ["bold", "italic", "underline", "strike"],
+      [{ script: "sub" }, { script: "super" }],
+      [{ list: "ordered" }, { list: "bullet" }],
+    ],
+  };
+
   return (
     // container
     <div className="flex w-full h-screen">
@@ -126,6 +136,7 @@ const EditRegularQuiz = ({ quiz }) => {
                 key={question.id}
                 className="my-5 px-20 py-10 bg-gray-100 border border-slate-400"
                 id={`question-${index}`}>
+                {/* question id */}
                 <input
                   type="hidden"
                   value={index}
@@ -148,16 +159,22 @@ const EditRegularQuiz = ({ quiz }) => {
                   )}
                 </div>
                 {/* question text */}
-                <TextareaAutosize
-                  {...register(`questions.${index}.questionText`)}
-                  minRows={1}
-                  maxRows={5}
-                  className={`w-full p-4 rounded ${
-                    errors.questions?.[index]?.questionText
-                      ? "border border-red-400"
-                      : "border-0"
-                  }`}
-                  placeholder="Type your question.."
+                <Controller
+                  control={control}
+                  name={`questions.${index}.questionText`}
+                  render={({ field }) => (
+                    <ReactQuill
+                      className={`bg-white ${
+                        errors.questions?.[index]?.questionText
+                          ? "border border-red-400"
+                          : "border-0"
+                      }`}
+                      placeholder="Type your question.."
+                      value={field.value}
+                      onChange={field.onChange}
+                      modules={quillQuestionModules}
+                    />
+                  )}
                 />
                 {/* question text error */}
                 <span className="text-sm text-red-400">
@@ -185,14 +202,14 @@ const EditRegularQuiz = ({ quiz }) => {
               Add Question
             </button>
             {/* error ketika pertanyaan kurang dari 2 */}
-            <span className="mb-4 text-sm text-red-400">
+            <span className="mb-4 text-red-400">
               {errors.questions?.message}
             </span>
             <div className="flex justify-center">
               <button
                 className="flex justify-center items-center w-1/2 px-4 py-2 text-white bg-green-600 rounded"
                 type="submit">
-                <span>Edit Quiz</span>
+                <span>Submit</span>
                 {isSubmitting && (
                   <ClipLoader color="#ffffff" loading={isSubmitting} />
                 )}
@@ -228,7 +245,7 @@ const Sidebar = ({ questionFields }) => {
 const TopNav = ({ user }) => {
   return (
     <header className="sticky top-0 flex justify-between items-center w-full px-6 py-2 bg-white shadow-md">
-      <h3 className="text-lg font-semibold">Edit Regular Quiz</h3>
+      <h3 className="text-lg font-semibold">Create Regular Quiz</h3>
       {user && (
         <div className="flex items-center gap-2">
           <span>{user.username}</span>
@@ -258,24 +275,37 @@ const NestedAnswer = ({ questionIndex, control, register, errors }) => {
     return letters[index];
   };
 
+  const quillAnswerModules = {
+    toolbar: [
+      ["bold", "italic", "underline", "strike"],
+      [{ script: "sub" }, { script: "super" }],
+    ],
+  };
+
   return (
     <div className="py-4">
       {answerField.map((answer, answerIndex) => (
         <div key={answer.id}>
           <div className="flex items-center">
             {/* letter */}
-            <span>{answerLetter(answerIndex)}</span>
+            <span className="mr-4">{answerLetter(answerIndex)}</span>
             {/* answer text */}
-            <TextareaAutosize
-              {...register(`questions.${questionIndex}.answer.${answerIndex}`)}
-              minRows={1}
-              maxRows={4}
-              className={`w-1/2 ml-4 px-4 py-3 rounded ${
-                errors.questions?.[questionIndex]?.answer?.[answerIndex]
-                  ? "border border-red-400"
-                  : "border-0"
-              }`}
-              placeholder={`option ${answerIndex + 1}`}
+            <Controller
+              control={control}
+              name={`questions.${questionIndex}.answer.${answerIndex}`}
+              render={({ field }) => (
+                <ReactQuill
+                  className={`w-1/2 bg-white ${
+                    errors.questions?.[questionIndex]?.answer?.[answerIndex]
+                      ? "border border-red-400"
+                      : "border-0"
+                  }`}
+                  placeholder="Type your answer.."
+                  value={field.value}
+                  onChange={field.onChange}
+                  modules={quillAnswerModules}
+                />
+              )}
             />
             {/* input radio untuk correct answer */}
             <div>
@@ -303,7 +333,7 @@ const NestedAnswer = ({ questionIndex, control, register, errors }) => {
             )}
             {/* error ketika tidak ada jawaban benar yang dipilih */}
             {answerIndex === 0 && (
-              <div className="text-sm text-red-400">
+              <div className="ml-4 text-sm text-red-400">
                 {errors.questions?.[questionIndex]?.correctAnswer?.message}
               </div>
             )}

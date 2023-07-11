@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 // third library
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.bubble.css";
 // use context hook
-import { useAuthContext } from "../../contexts/authContext";
+import useAuthContext from "../../hooks/useAuthContext";
 
 const PlayRegulerQuiz = ({ quiz, quizToken }) => {
   const { user } = useAuthContext();
@@ -164,12 +166,19 @@ const PlayRegulerQuiz = ({ quiz, quizToken }) => {
               key={questionIndex}
               id={questionIndex}
               className="mb-2 p-5 bg-white border shadow-lg">
+              {/* question number */}
+              <div className="p-2 font-semibold bg-slate-300">
+                Pertanyaan {questionIndex + 1}
+              </div>
               {/* question text */}
-              <h2 className="mb-2 text-xl font-bold">
-                {questionIndex + 1}. {question.questionText}
-              </h2>
+              <ReactQuill
+                value={question.questionText}
+                theme="bubble"
+                readOnly
+                className="mb-2 font-bold border border-slate-400"
+              />
               {/* option */}
-              <ul className="space-y-1">
+              <ul>
                 {question.answer.map((option, optionIndex) => (
                   <li key={optionIndex}>
                     <div className="flex items-center ml-5 gap-2">
@@ -182,7 +191,12 @@ const PlayRegulerQuiz = ({ quiz, quizToken }) => {
                         name={question.questionId}
                         onChange={handleAnswerChange}
                       />
-                      <span>{option}</span>
+                      <ReactQuill
+                        value={option}
+                        theme="bubble"
+                        readOnly
+                        className="grow"
+                      />
                     </div>
                   </li>
                 ))}

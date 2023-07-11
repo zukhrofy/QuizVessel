@@ -2,9 +2,11 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import ClipLoader from "react-spinners/ClipLoader";
-import { useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import TextareaAutosize from "react-textarea-autosize";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 // import useContext hooks
 import useAuthContext from "../../hooks/useAuthContext";
 // import yup schema and default value
@@ -207,7 +209,7 @@ const EditSectionedQuiz = ({ quiz }) => {
               <button
                 className="flex justify-center items-center w-1/2 px-4 py-2 text-white bg-green-600 rounded"
                 type="submit">
-                <span>Edit Quiz</span>
+                <span>Submit</span>
                 {isSubmitting && (
                   <ClipLoader color="#ffffff" loading={isSubmitting} />
                 )}
@@ -243,7 +245,7 @@ const Sidebar = ({ sectionFields }) => {
 const TopNav = ({ user }) => {
   return (
     <header className="sticky top-0 flex justify-between items-center w-full px-6 py-2 bg-white shadow-md">
-      <h3 className="text-lg font-semibold">Edit Sectioned Quiz</h3>
+      <h3 className="text-lg font-semibold">Create Sectioned Quiz</h3>
       {user && (
         <div className="flex items-center gap-2">
           <span>{user.username}</span>
@@ -269,61 +271,73 @@ const NestedSoal = ({ sectionIndex, control, register, errors }) => {
     name: `sections.${sectionIndex}.questionSet`,
   });
 
+  // module for react-quill
+  const quillQuestionModules = {
+    toolbar: [
+      ["bold", "italic", "underline", "strike"],
+      [{ script: "sub" }, { script: "super" }],
+      [{ list: "ordered" }, { list: "bullet" }],
+    ],
+  };
   return (
     <div>
       {questionSetFields.map((question, questionIndex) => (
-        <>
-          <div
-            key={question.id}
-            className="mb-2 p-10 bg-white border border-slate-400">
-            {/* question id */}
-            <input
-              type="hidden"
-              value={questionIndex}
-              {...register(
-                `sections.${sectionIndex}.questionSet[${questionIndex}].questionId`
-              )}
-            />
-            <div className="flex justify-between items-center mb-1">
-              {/* question number */}
-              <h1 className="text-xl font-semibold">
-                Question {questionIndex + 1}
-              </h1>
-              {/* delete question */}
-              {questionSetFields.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeQuestionSet(questionIndex)}
-                  className="text-2xl">
-                  x
-                </button>
-              )}
-            </div>
-            {/* question text */}
-            <TextareaAutosize
-              {...register(
-                `sections[${sectionIndex}].questionSet[${questionIndex}].questionText`
-              )}
-              className={`w-full p-2 border border-gray-400 rounded ${
-                errors?.sections?.[sectionIndex]?.questionSet?.[questionIndex]
-                  ?.questionText && "border border-red-400"
-              }`}
-              placeholder="Type your question.."
-            />
-            <span className="text-sm text-red-500">
-              {
-                errors?.sections?.[sectionIndex]?.questionSet?.[questionIndex]
-                  ?.questionText?.message
-              }
-            </span>
-            {/* Add answer options and correct answer fields */}
-            <NestedAnswer
-              sectionIndex={sectionIndex}
-              questionIndex={questionIndex}
-              {...{ control, register, errors }}
-            />
+        <div
+          key={question.id}
+          className="mb-2 p-10 bg-white border border-slate-400">
+          {/* question id */}
+          <input
+            type="hidden"
+            value={questionIndex}
+            {...register(
+              `sections.${sectionIndex}.questionSet[${questionIndex}].questionId`
+            )}
+          />
+          <div className="flex justify-between items-center mb-1">
+            {/* question number */}
+            <h1 className="text-xl font-semibold">
+              Question {questionIndex + 1}
+            </h1>
+            {/* delete question */}
+            {questionSetFields.length > 1 && (
+              <button
+                type="button"
+                onClick={() => removeQuestionSet(questionIndex)}
+                className="text-2xl">
+                x
+              </button>
+            )}
           </div>
-        </>
+          {/* question text */}
+          <Controller
+            control={control}
+            name={`sections[${sectionIndex}].questionSet[${questionIndex}].questionText`}
+            render={({ field }) => (
+              <ReactQuill
+                className={`bg-white ${
+                  errors?.sections?.[sectionIndex]?.questionSet?.[questionIndex]
+                    ?.questionText && "border border-red-400"
+                }`}
+                placeholder="Type your question.."
+                value={field.value}
+                onChange={field.onChange}
+                modules={quillQuestionModules}
+              />
+            )}
+          />
+          <span className="text-sm text-red-500">
+            {
+              errors?.sections?.[sectionIndex]?.questionSet?.[questionIndex]
+                ?.questionText?.message
+            }
+          </span>
+          {/* Add answer options and correct answer fields */}
+          <NestedAnswer
+            sectionIndex={sectionIndex}
+            questionIndex={questionIndex}
+            {...{ control, register, errors }}
+          />
+        </div>
       ))}
       {/* error ketika question kurang dari dua */}
       <div className="text-red-500">
@@ -368,25 +382,37 @@ const NestedAnswer = ({
     return letters[index];
   };
 
+  const quillAnswerModules = {
+    toolbar: [
+      ["bold", "italic", "underline", "strike"],
+      [{ script: "sub" }, { script: "super" }],
+    ],
+  };
+
   return (
     <div className="py-4">
       {answerFields.map((answer, answerIndex) => (
         <div key={answer.id}>
           <div className="flex items-center">
             {/* letter */}
-            <span>{answerLetter(answerIndex)}</span>
+            <span className="mr-4">{answerLetter(answerIndex)}</span>
             {/* option text */}
-            <TextareaAutosize
-              {...register(
-                `sections[${sectionIndex}].questionSet[${questionIndex}].answer[${answerIndex}]`
+            <Controller
+              control={control}
+              name={`sections[${sectionIndex}].questionSet[${questionIndex}].answer[${answerIndex}]`}
+              render={({ field }) => (
+                <ReactQuill
+                  className={`w-1/2 bg-white ${
+                    errors?.sections?.[sectionIndex]?.questionSet?.[
+                      questionIndex
+                    ]?.answer?.[answerIndex] && "border border-red-400"
+                  }`}
+                  placeholder="Type your answer.."
+                  value={field.value}
+                  onChange={field.onChange}
+                  modules={quillAnswerModules}
+                />
               )}
-              minRows={1}
-              maxRows={4}
-              className={`w-1/2 ml-4 px-4 py-3 border border-gray-400 rounded ${
-                errors?.sections?.[sectionIndex]?.questionSet?.[questionIndex]
-                  ?.answer?.[answerIndex] && "border border-red-400"
-              }`}
-              placeholder={`option ${answerIndex + 1}`}
             />
             {/* input radio untuk correct answer */}
             <div>
@@ -416,7 +442,7 @@ const NestedAnswer = ({
             )}
             {/* error ketika tidak memmilih correct answer */}
             {answerIndex === 0 && (
-              <div className="text-sm text-red-400">
+              <div className="ml-4 text-sm text-red-400">
                 {
                   errors.sections?.[sectionIndex]?.questionSet?.[questionIndex]
                     ?.correctAnswer?.message
