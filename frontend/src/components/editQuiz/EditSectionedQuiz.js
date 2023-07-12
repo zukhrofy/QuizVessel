@@ -277,8 +277,11 @@ const NestedSoal = ({ sectionIndex, control, register, errors }) => {
       ["bold", "italic", "underline", "strike"],
       [{ script: "sub" }, { script: "super" }],
       [{ list: "ordered" }, { list: "bullet" }],
+      [{ direction: "rtl" }],
+      [{ color: [] }, { background: [] }],
     ],
   };
+
   return (
     <div>
       {questionSetFields.map((question, questionIndex) => (
@@ -386,6 +389,8 @@ const NestedAnswer = ({
     toolbar: [
       ["bold", "italic", "underline", "strike"],
       [{ script: "sub" }, { script: "super" }],
+      [{ direction: "rtl" }],
+      [{ color: [] }, { background: [] }],
     ],
   };
 

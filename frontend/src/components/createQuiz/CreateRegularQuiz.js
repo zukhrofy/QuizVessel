@@ -74,6 +74,8 @@ const CreateRegularQuiz = () => {
       ["bold", "italic", "underline", "strike"],
       [{ script: "sub" }, { script: "super" }],
       [{ list: "ordered" }, { list: "bullet" }],
+      [{ direction: "rtl" }],
+      [{ color: [] }, { background: [] }],
     ],
   };
 
@@ -276,6 +278,8 @@ const NestedAnswer = ({ questionIndex, control, register, errors }) => {
     toolbar: [
       ["bold", "italic", "underline", "strike"],
       [{ script: "sub" }, { script: "super" }],
+      [{ direction: "rtl" }],
+      [{ color: [] }, { background: [] }],
     ],
   };
 
