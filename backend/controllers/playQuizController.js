@@ -136,10 +136,12 @@ const processSubmit = async (req, res) => {
         ((sectionScore / questionSet.length) * 100).toFixed(2)
       );
       results[sectionId].sectionScore = sectionTotalScore;
-      totalScore = +sectionTotalScore;
+      totalScore = totalScore + sectionTotalScore;
     });
 
+    console.log(totalScore);
     const nilaiAkhir = parseFloat((totalScore / quizSection.length).toFixed(2));
+    console.log(nilaiAkhir);
 
     // update participant status and result
     const participant = await Participant.findOneAndUpdate(

@@ -12,6 +12,8 @@ import useAuthContext from "../../hooks/useAuthContext";
 import { regularSchema } from "../../schemas/quizSchema";
 // import local library
 import { useEffect, useState } from "react";
+import katex from "katex";
+import "katex/dist/katex.min.css";
 
 const EditRegularQuiz = ({ quiz }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -71,14 +73,26 @@ const EditRegularQuiz = ({ quiz }) => {
     name: "questions",
   });
 
+  useEffect(() => {
+    window.katex = katex;
+  }, []);
+
   // module for react-quill
   const quillQuestionModules = {
     toolbar: [
+      [{ size: [] }],
       ["bold", "italic", "underline", "strike"],
       [{ script: "sub" }, { script: "super" }],
-      [{ list: "ordered" }, { list: "bullet" }],
-      [{ direction: "rtl" }],
+      [
+        { list: "ordered" },
+        { list: "bullet" },
+        { indent: "-1" },
+        { indent: "+1" },
+      ],
+      [{ align: [] }],
       [{ color: [] }, { background: [] }],
+      ["blockquote", "code-block"],
+      ["formula"],
     ],
   };
 
@@ -279,10 +293,19 @@ const NestedAnswer = ({ questionIndex, control, register, errors }) => {
 
   const quillAnswerModules = {
     toolbar: [
+      [{ size: [] }],
       ["bold", "italic", "underline", "strike"],
       [{ script: "sub" }, { script: "super" }],
-      [{ direction: "rtl" }],
+      [
+        { list: "ordered" },
+        { list: "bullet" },
+        { indent: "-1" },
+        { indent: "+1" },
+      ],
+      [{ align: [] }],
       [{ color: [] }, { background: [] }],
+      ["blockquote", "code-block"],
+      ["formula"],
     ],
   };
 

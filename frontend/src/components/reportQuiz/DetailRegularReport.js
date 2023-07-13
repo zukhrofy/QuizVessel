@@ -56,7 +56,9 @@ const OverallQuizStatistic = ({ participants }) => {
   const lowestScore = Math.min(...nilaiAkhirArray);
   const totalScores = nilaiAkhirArray.reduce((sum, score) => sum + score, 0);
   // nilai rata-rata
-  const averageScore = totalScores / participants.length;
+  const averageScore = parseFloat(
+    (totalScores / participants.length).toFixed(2)
+  );
 
   return (
     <div className="mb-8 p-8 bg-white border border-slate-500 shadow-md">

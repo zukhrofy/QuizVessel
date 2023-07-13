@@ -122,7 +122,7 @@ const PlayRegulerQuiz = ({ quiz, quizToken }) => {
     <>
       <div className="h-screen flex">
         {/* sidebar */}
-        <aside className="h-full p-4 bg-stone-300 overflow-y-auto">
+        <aside className="h-full max-w-sm p-4 bg-stone-300 overflow-y-auto">
           {/* title */}
           <h2 className="mb-4 text-3xl text-center font-bold">{quiz.title}</h2>
           {/* timer */}

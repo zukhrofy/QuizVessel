@@ -62,6 +62,9 @@ const PlaySectionedQuiz = ({ quiz, quizToken }) => {
   // change section manually or triggered when time section is 0
   const handleNextSection = () => {
     if (currentSectionIndex < section.length - 1) {
+      window.scrollTo({
+        top: 0,
+      });
       setCurrentSectionIndex((prevIndex) => prevIndex + 1);
     } else {
       // Quiz finished
@@ -124,7 +127,7 @@ const PlaySectionedQuiz = ({ quiz, quizToken }) => {
     <>
       <div className="h-screen flex">
         {/* sidebar */}
-        <aside className="h-full p-4 bg-stone-300 overflow-y-auto">
+        <aside className="h-full max-w-sm p-4 bg-stone-300 overflow-y-auto">
           {/* title */}
           <h2 className="mb-5 text-3xl text-center font-bold">{quiz.title}</h2>
           {/* section number and title */}

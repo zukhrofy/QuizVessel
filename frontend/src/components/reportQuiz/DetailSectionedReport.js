@@ -66,7 +66,9 @@ const OverallQuizStatistic = ({ participants }) => {
   const lowestScore = Math.min(...nilaiAkhirArray);
   const totalScores = nilaiAkhirArray.reduce((sum, score) => sum + score, 0);
   // nilai rata-rata
-  const averageScore = totalScores / participants.length;
+  const averageScore = parseFloat(
+    (totalScores / participants.length).toFixed(2)
+  );
 
   return (
     <div className="mb-8 p-8 bg-white border border-slate-500 shadow-md">
@@ -138,7 +140,7 @@ const ParticipantDetailTab = ({ participants, sectionsDetail }) => {
       {/* title */}
       <h1 className="mb-2 text-xl font-bold">Detail Peserta</h1>
       {/* tabel */}
-      <TableComponent columns={columns} data={data} />;
+      <TableComponent columns={columns} data={data} />
       {/* selected participant modal */}
       {selectedParticipant && (
         <ResultModal
@@ -420,9 +422,10 @@ const ResultModal = ({
 
             return (
               <div key={sectionIndex} className="mb-4">
-                <h1 className="text-right font-medium">
-                  Section {section.sectionTitle}
-                </h1>
+                <div className="flex justify-between font-medium">
+                  <p>Section {section.sectionTitle}</p>
+                  <p>score: {participantSectionAnswer.sectionScore}</p>
+                </div>
                 <table className="w-full">
                   <thead>
                     <tr className="border bg-gray-300">
