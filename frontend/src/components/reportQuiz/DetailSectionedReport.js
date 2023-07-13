@@ -164,7 +164,9 @@ const DetailedSectionsTab = ({ participants, sectionDetail }) => {
       (previousScore, currentScore) => previousScore + currentScore,
       0
     );
-    const averageSectionScore = totalScores / participants.length;
+    const averageSectionScore = parseFloat(
+      (totalScores / participants.length).toFixed(2)
+    );
     const highestSectionScore = Math.max(...sectionScoresArray);
     const lowestSectionScore = Math.min(...sectionScoresArray);
 
@@ -228,7 +230,9 @@ const SectionAnalysisTab = ({ participants, sectionsDetail }) => {
   Object.keys(sectionSummaries).forEach((sectionId) => {
     const summary = sectionSummaries[sectionId];
     // menambahkan nilai rata rata tiap section
-    summary.averageScore = summary.totalScore / participants.length;
+    summary.averageScore = parseFloat(
+      (summary.totalScore / participants.length).toFixed(2)
+    );
     // menambahkan kesimpulan
     if (summary.averageScore >= 0 && summary.averageScore <= 30) {
       summary.summary = `peserta mengalami kesulitan mengenai section ini karena nilai rata rata hanya ${summary.averageScore}`;
