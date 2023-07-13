@@ -236,10 +236,12 @@ const SectionAnalysisTab = ({ participants, sectionsDetail }) => {
     // menambahkan kesimpulan
     if (summary.averageScore >= 0 && summary.averageScore <= 30) {
       summary.summary = `peserta mengalami kesulitan mengenai section ini karena nilai rata rata hanya ${summary.averageScore}`;
-    } else if (summary.averageScore > 30 && summary.averageScore <= 60) {
+    } else if (summary.averageScore > 30 && summary.averageScore <= 65) {
       summary.summary = `Banyak peserta yang merasa bingung dengan bagian ini karena nilai rata rata hanya ${summary.averageScore}`;
-    } else if (summary.averageScore > 60 && summary.averageScore <= 99) {
-      summary.summary = `peserta mampu menjawab bagian ini karena nilai rata rata sekitar ${summary.averageScore}`;
+    } else if (summary.averageScore > 65 && summary.averageScore <= 99) {
+      summary.summary = `peserta mampu menjawab bagian ini dengan mudah karena nilai rata rata sekitar ${summary.averageScore}`;
+    } else if (summary.averageScore === 100) {
+      summary.summary = `bagian ini mampu dituntakan oleh seluruh peserta karena nilai rata rata ${summary.averageScore}`;
     }
   });
 
