@@ -9,26 +9,25 @@ const morgan = require("morgan");
 // express instance
 const app = express();
 
+// middleware
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(morgan("dev"));
+
 // import api routes
 const userRouter = require("./routes/user");
 const quizRouter = require("./routes/quiz");
 const playRouter = require("./routes/play");
 const reportRouter = require("./routes/report");
 
-// middleware
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(morgan("dev"));
-
-// use api routes
-app.use("/users", userRouter);
-app.use("/quiz", quizRouter);
-app.use("/play", playRouter);
-app.use("/report", reportRouter);
+app.use("/api/users", userRouter);
+app.use("/api/quiz", quizRouter);
+app.use("/api/play", playRouter);
+app.use("/api/report", reportRouter);
 
 // connect db and server
 mongoose
-  .connect("mongodb://0.0.0.0:27017/skripsi")
+  .connect(process.env.MONGODB_URI)
   .then(() => {
     // listen for requests
     app.listen(process.env.PORT, () => {

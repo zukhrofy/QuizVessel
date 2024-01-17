@@ -9,7 +9,7 @@ const {
   signupUser,
 } = require("../controllers/UserController");
 
-// // login route
+// login route
 router.post("/login", validate("loginUser"), loginUser);
 // signup route
 router.post("/signup", validate("signupUser"), signupUser);

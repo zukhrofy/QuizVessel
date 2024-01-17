@@ -2,21 +2,27 @@ const Participant = require("../models/ParticipantModels");
 const Report = require("../models/ReportModels");
 
 // quiz preview
-const getPlayQuizDetail = async (req, res) => {
+const getPlayQuizPreview = async (req, res) => {
   const quizToken = req.params.quizToken;
   const assignedQuiz = await Report.findOne({ token: quizToken });
 
-  if (!assignedQuiz) {
-    return res.status(404).json({ message: "quiz not found" });
-  }
+  // cek apakah token tersedia
+  if (!assignedQuiz) return res.status(404).json({ error: "quiz not found" });
 
   // check ketersediaan quiz
   const isFinished = assignedQuiz.finished;
   if (isFinished) {
-    return res.status(403).json({ isFinished });
+    return res.status(403).json({
+      error: {
+        message: "Maaf Quiz Telah Melewati Deadline",
+        description:
+          "Batas waktu untuk quiz ini telah berakhir. Anda tidak dapat bergabung lagi.",
+      },
+    });
   }
 
-  res.status(200).json(assignedQuiz);
+  // jika quiz masih bisa diakses
+  return res.status(200).json(assignedQuiz);
 };
 
 // quiz start
@@ -168,7 +174,7 @@ const getQuizResult = async (req, res) => {
 };
 
 module.exports = {
-  getPlayQuizDetail,
+  getPlayQuizPreview,
   playQuizStart,
   processSubmit,
   getQuizResult,
